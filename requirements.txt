@@ -1,2 +1,4 @@
 pyparsing
 bottle
+matplotlib
+numpy
