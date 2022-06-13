@@ -6,6 +6,7 @@ from hashlib import sha256
 import secrets
 
 import funkcije
+from pomozne_funkcije import linspace
 
 
 class ShranljivObjekt:
@@ -117,6 +118,20 @@ class Funkcija(ShranljivObjekt):
     def narisi_graf(self, obmocje, ime_datoteke):
         """Nariši graf funkcije na podanem območju in ga shrani v datoteko"""
         funkcije.narisi_graf(self.izraz, obmocje, ime_datoteke)
+
+    def izracunaj_odvod(self, tocka):
+        """Izračunaj približek odvoda v točki."""
+        return funkcije.izracunaj_odvod(self.izraz, tocka)
+
+    def narisi_odvod(self, obmocje, ime_datoteke):
+        """Nariši graf odvoda na območju in ga shrani v datoteko."""
+        xs = []
+        ys = []
+        for x in linspace(obmocje[0], obmocje[1]):
+            xs.append(x)
+            ys.append(self.izracunaj_odvod(x))
+
+        funkcije.narisi_graf_iz_tock(xs, ys, ime_datoteke)
 
 
 class Naloga(ShranljivObjekt):
@@ -254,7 +269,16 @@ if __name__ == "__main__":
     primer = Integrator.ustvari_iz_datoteke("primer.json")
     primer.uporabniki.append(Uporabnik.ustvari_uporabnika("janez", "novak"))
     funkcija = Funkcija("2*x")
+    integrirana = Funkcija("x^2 + 3")
     primer.naloge.append(Naloga("primer.html", funkcija, 1))
+    primer.uporabniki[0].oddaje.append(Oddaja(
+        primer.naloge[0]._id,
+        integrirana,
+        "2022-03-22 03:33:22",
+        100
+    ))
     primer.shrani_v_datoteko("prebavljen_primer.json")
 
-    funkcija.narisi_graf([-5, 5], "primer.png")
+    # funkcija.narisi_graf([-5, 5], "primer.png")
+    integrirana.narisi_odvod([-5, 5], "primer.png")
+

@@ -2,6 +2,8 @@ import pyparsing as pp
 import math
 import matplotlib.pyplot as plt
 
+from pomozne_funkcije import linspace
+
 
 # Poznane/dovoljene funkcije
 FUNKCIJE = {
@@ -151,17 +153,16 @@ def evaluiraj_izraz(izraz: list, x: float):
     return rekurzivna_evalvacija(izraz, kontekst)
 
 
+def narisi_graf_iz_tock(x_tocke, y_tocke, ime_datoteke):
+    """Nariši graf iz podanih (x,y) točk, ter ga shrani v datoteko."""
+    fig = plt.figure()
+    axes = fig.add_subplot()
+    axes.plot(x_tocke, y_tocke)
+    fig.savefig(ime_datoteke)
+
+
 def narisi_graf(izraz, obmocje, ime_datoteke):
     """Nariši graf funkcije v izrazu na danem območju. Narisano sliko shrani v datoteko."""
-
-    # TODO: Ta funkcija mora biti časovno omejena
-
-    def linspace(a, b, n=100):
-        """Generiraj n enakomerno razporejenih točk med a in b"""
-        idx = 0
-        while idx < n:
-            idx += 1
-            yield (b-a) * idx / n
 
     xs = []
     ys = []
@@ -176,10 +177,17 @@ def narisi_graf(izraz, obmocje, ime_datoteke):
         xs.append(x)
         ys.append(y)
 
-    fig = plt.figure()
-    axes = fig.add_subplot()
-    axes.plot(xs, ys)
-    fig.savefig(ime_datoteke)
+    narisi_graf_iz_tock(xs, ys, ime_datoteke)
+
+
+def izracunaj_odvod(izraz, tocka):
+    """Izračunaj numerični približek odvoda izraza v dani točki."""
+    EPS = 1e-5
+
+    desno = evaluiraj_izraz(izraz, tocka+EPS)
+    levo = evaluiraj_izraz(izraz, tocka-EPS)
+
+    return (desno - levo) / 2 / EPS
 
 
 if __name__ == "__main__":
