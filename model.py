@@ -5,6 +5,8 @@ from datetime import datetime
 from hashlib import sha256
 import secrets
 
+import funkcije
+
 
 class ShranljivObjekt:
     """Osnovni razred za vse razrede, ki se lahko shranijo v datoteko."""
@@ -60,6 +62,10 @@ class ShranljivObjekt:
 
 
 class Funkcija(ShranljivObjekt):
+
+    # Parser za spremembo niza v 'pravo' funkcijo potrebujemo konstruirati le enkrat
+    _parser = None
+
     def __init__(self, niz=None, slovar=None):
         super(Funkcija, self).__init__(slovar=slovar)
         if slovar is not None and "niz" in slovar:
@@ -69,6 +75,9 @@ class Funkcija(ShranljivObjekt):
             raise ValueError("Niz ni bil podan.")
 
         self.niz = niz
+
+        # Izraz, ki ga lahko evaluiramo
+        self._izraz = None
 
     def shrani_v_slovar(self):
         slovar = super(Funkcija, self).shrani_v_slovar()
@@ -90,6 +99,24 @@ class Funkcija(ShranljivObjekt):
 
     def __str__(self):
         return f"Funkcija {self.niz}"
+
+    @classmethod
+    def _pridobi_parser(cls):
+        """Pridobi parser za spremembo niza v izraz."""
+        if cls._parser is None:
+            cls._parser = funkcije.pridobi_parser()
+        return cls._parser
+
+    @property
+    def izraz(self):
+        """Pridobi izraz, ki pripada funkciji"""
+        if self._izraz is None:
+            self._izraz = funkcije.ustvari_izraz(self.niz, self._pridobi_parser())
+        return self._izraz
+
+    def narisi_graf(self, obmocje, ime_datoteke):
+        """Nariši graf funkcije na podanem območju in ga shrani v datoteko"""
+        funkcije.narisi_graf(self.izraz, obmocje, ime_datoteke)
 
 
 class Naloga(ShranljivObjekt):
@@ -226,4 +253,8 @@ class Integrator(ShranljivObjekt):
 if __name__ == "__main__":
     primer = Integrator.ustvari_iz_datoteke("primer.json")
     primer.uporabniki.append(Uporabnik.ustvari_uporabnika("janez", "novak"))
+    funkcija = Funkcija("2*x")
+    primer.naloge.append(Naloga("primer.html", funkcija, 1))
     primer.shrani_v_datoteko("prebavljen_primer.json")
+
+    funkcija.narisi_graf([-5, 5], "primer.png")

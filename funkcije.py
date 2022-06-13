@@ -100,6 +100,12 @@ def predelaj_izraz(izraz: pp.ParseResults):
     return izraz
 
 
+def ustvari_izraz(niz: str, parser):
+    """Ustvari izraz iz niza ter ga vrni že očiščenega."""
+    izraz = parser.parseString(niz)
+    return predelaj_izraz(izraz)
+
+
 def evaluiraj_izraz(izraz: list, x: float):
     """Evaluiraj izraz, predstavljen s seznamom, pri vrednosti x"""
 
@@ -187,7 +193,6 @@ if __name__ == "__main__":
     print("Narisan graf shranjen v test.png")
 
     zahteven_izraz = "99999^x"
-    zahteven_izraz = parser.parseString(zahteven_izraz)
-    zahteven_izraz = predelaj_izraz(zahteven_izraz)
+    zahteven_izraz = ustvari_izraz(zahteven_izraz, parser)
     narisi_graf(zahteven_izraz, [-100, 100], "zahteven_test.png")
     print("Narisan graf shranjen v zahteven_test.png")
