@@ -109,8 +109,11 @@ def ustvari_izraz(niz: str, parser):
 def evaluiraj_izraz(izraz: list, x: float):
     """Evaluiraj izraz, predstavljen s seznamom, pri vrednosti x"""
 
+    # TODO: Ta funkcija mora biti časovno omejena
+
     def rekurzivna_evalvacija(izraz, kontekst):
         """Rekurzivno evaluiraj izraz"""
+
         if not isinstance(izraz, list):
 
             if isinstance(izraz, str):
@@ -121,9 +124,9 @@ def evaluiraj_izraz(izraz: list, x: float):
 
         if len(izraz) == 1:
             # To se načeloma nebi smelo zgoditi
-            return rekurzivna_evalvacija(izraz, kontekst)
+            return rekurzivna_evalvacija(izraz[0], kontekst)
 
-        elif isinstance(izraz[0], str):
+        elif isinstance(izraz[0], str) and (izraz[0] in FUNKCIJE or izraz[0] in "+-"):
 
             if izraz[0] in FUNKCIJE:
                 argumenti = [rekurzivna_evalvacija(podizraz, kontekst) for podizraz in izraz[1:]]
