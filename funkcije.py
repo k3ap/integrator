@@ -1,5 +1,6 @@
 import pyparsing as pp
 import math
+import matplotlib.pyplot as plt
 
 
 # Poznane/dovoljene funkcije
@@ -141,6 +142,37 @@ def evaluiraj_izraz(izraz: list, x: float):
     return rekurzivna_evalvacija(izraz, kontekst)
 
 
+def narisi_graf(izraz, obmocje, ime_datoteke):
+    """Nariši graf funkcije v izrazu na danem območju. Narisano sliko shrani v datoteko."""
+
+    # TODO: Ta funkcija mora biti časovno omejena
+
+    def linspace(a, b, n=100):
+        """Generiraj n enakomerno razporejenih točk med a in b"""
+        idx = 0
+        while idx < n:
+            idx += 1
+            yield (b-a) * idx / n
+
+    xs = []
+    ys = []
+
+    for x in linspace(obmocje[0], obmocje[1]):
+        try:
+            y = evaluiraj_izraz(izraz, x)
+        except (ZeroDivisionError, OverflowError):
+            # Overflow se lahko pojavi pri npr. visokih potencah
+            y = math.inf
+
+        xs.append(x)
+        ys.append(y)
+
+    fig = plt.figure()
+    axes = fig.add_subplot()
+    axes.plot(xs, ys)
+    fig.savefig(ime_datoteke)
+
+
 if __name__ == "__main__":
     izraz = "3 + exp((-x^9 - 7*x)/2)"
     parser = pridobi_parser()
@@ -151,10 +183,11 @@ if __name__ == "__main__":
     for x in [0, 0.1, 1.0, 7]:
         print(f"f({x}) = {evaluiraj_izraz(izraz, x)}")
 
-    import matplotlib.pyplot as plt
-    import numpy as np
+    narisi_graf(izraz, [1, 10], "test.png")
+    print("Narisan graf shranjen v test.png")
 
-    xs = np.linspace(-1, 2)
-    ys = [evaluiraj_izraz(izraz, x) for x in xs]
-    plt.plot(xs, ys)
-    plt.show()
+    zahteven_izraz = "99999^x"
+    zahteven_izraz = parser.parseString(zahteven_izraz)
+    zahteven_izraz = predelaj_izraz(zahteven_izraz)
+    narisi_graf(zahteven_izraz, [-100, 100], "zahteven_test.png")
+    print("Narisan graf shranjen v zahteven_test.png")

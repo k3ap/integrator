@@ -1,4 +1,3 @@
 pyparsing
 bottle
 matplotlib
-numpy
