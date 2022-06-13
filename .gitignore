@@ -2,3 +2,4 @@
 venv/
 prebavljen_primer.json
 *.png
+__pycache__/
