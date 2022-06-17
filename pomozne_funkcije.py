@@ -3,4 +3,4 @@ def linspace(a, b, n=100):
     idx = 0
     while idx < n:
         idx += 1
-        yield (b - a) * idx / n
+        yield a + (b - a) * idx / n
