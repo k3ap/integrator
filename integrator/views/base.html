@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>
+            % if defined('naslov'):
+            Integrator: {{ naslov }}
+            % else:
+            Integrator
+            % end
+        </title>
+
+        <!-- CSS ogrodje -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    <body class="brown lighten-5">
+        <h2 class="center-align">Integrator</h2>
+        % if defined('naslov'):
+            <h4 class="center-align brown-text">{{ naslov }}</h4>
+        % end
+        <div class="container">
+            {{!base}}
+        </div>
+
+        <!-- CSS ogrodje -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    </body>
+</html>

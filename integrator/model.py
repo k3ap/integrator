@@ -264,6 +264,17 @@ class Integrator(ShranljivObjekt):
         })
         return slovar
 
+    def poisci_uporabnika(self, uporabnisko_ime: str):
+        """Poišči in vrni uporabnika z podanim imenom. Če tak uporabnik ne obstaja, vrni None"""
+        for up in self.uporabniki:
+            if up.uporabnisko_ime == uporabnisko_ime:
+                return up
+        return None
+
+    def ustvari_uporabnika(self, uporabnisko_ime, geslo):
+        """Ustvari novega uporabnika."""
+        self.uporabniki.append(Uporabnik.ustvari_uporabnika(uporabnisko_ime, geslo))
+
 
 if __name__ == "__main__":
     primer = Integrator.ustvari_iz_datoteke("primer.json")

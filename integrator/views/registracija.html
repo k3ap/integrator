@@ -1,0 +1,35 @@
+% rebase('base.html', naslov="Registracija")
+
+
+<div class="row">
+    <div class="card-panel col s8 offset-s2">
+        % if napaka:
+        <div class="red lighten-2 center-align">{{ napaka }}</div>
+        % end
+        <br>
+        <form class="row" method="post">
+            <div class="col s10 offset-s1">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input type="text" class="validate" id="uporabnisko_ime" name="uporabnisko_ime">
+                        <label for="uporabnisko_ime">Uporabniško ime</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input type="password" class="validate" id="geslo" name="geslo">
+                        <label for="geslo">Geslo</label>
+                    </div>
+                </div>
+
+                <div class="row center-align">
+                    <button class="btn waves-effect waves-light brown" type="submit" name="action">
+                        Pošlji
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
