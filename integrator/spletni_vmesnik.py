@@ -3,7 +3,7 @@ import os
 import shutil
 
 import pomozne_funkcije
-from integrator import model
+import model
 
 
 DATOTEKA_Z_BAZO_PODATKOV = "db.json"
@@ -61,3 +61,4 @@ def registracija():
 if __name__ == "__main__":
     debug_nacin = os.environ.get("DEBUG") is not None
     bottle.run(reloader=debug_nacin, debug=debug_nacin)
+    integrator.shrani_v_datoteko(DATOTEKA_Z_BAZO_PODATKOV)
