@@ -16,12 +16,34 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </head>
     <body class="brown lighten-5">
-        <h2 class="center-align">Integrator</h2>
-        % if defined('naslov'):
-            <h4 class="center-align brown-text">{{ naslov }}</h4>
-        % end
-        <div class="container">
-            {{!base}}
+        <div class="row">
+            <div class="col s8 offset-s2">
+                <h2 class="center-align">Integrator</h2>
+                % if defined('naslov'):
+                    <h4 class="center-align brown-text">{{ naslov }}</h4>
+                % end
+            </div>
+
+            % if defined('uporabnik'):
+
+            <div class="col s2">
+                <div class="card">
+                    <div class="card-content">
+                        Trenutno prijavljeni kot <i>{{ uporabnik.uporabnisko_ime }}</i>.
+                    </div>
+                    <div class="card-action">
+                        <a href="/odjava/">Odjava</a>
+                    </div>
+                </div>
+            </div>
+
+            % end
+        </div>
+
+        <div class="row">
+            <div class="container">
+                {{!base}}
+            </div>
         </div>
 
         <!-- CSS ogrodje -->

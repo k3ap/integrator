@@ -1,2 +1,3 @@
 * TODO Polepšaj naslov na spletni strani
 * TODO Dodaj uvodno besedilo
+* TODO Obrazec za spremembo gesla

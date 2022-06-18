@@ -228,17 +228,26 @@ class Uporabnik(ShranljivObjekt):
         return secrets.token_hex(16)
 
     @classmethod
+    def razprsi(cls, geslo, sol):
+        """Ustvari razprsitev iz gesla in soli."""
+        return sha256((geslo+sol).encode('utf8')).hexdigest()
+
+    @classmethod
     def ustvari_uporabnika(cls, uporabnisko_ime, geslo):
         sol = cls.pridobi_sol()
         return Uporabnik(
             oddaje=[],
             uporabnisko_ime=uporabnisko_ime,
             sol=sol,
-            razprsitev=sha256((geslo+sol).encode('utf8')).hexdigest()
+            razprsitev=Uporabnik.razprsi(geslo, sol)
         )
 
     def __str__(self):
         return f"Uporabnik {self.uporabnisko_ime}"
+
+    def preveri_geslo(self, geslo: str):
+        """Vrne True, če je geslo pravilno za tega uporabnika, in False sicer."""
+        return self.razprsitev == self.razprsi(geslo, self.sol)
 
 
 class Integrator(ShranljivObjekt):

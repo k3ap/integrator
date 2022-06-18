@@ -26,19 +26,51 @@ with open("SKRIVNOST") as f:
     SKRIVNOST = f.read()
 
 
+def poisci_trenutnega_uporabnika():
+    """Poišči in vrni Uporabnik objekt, povezan s trenutno prijavljenim uporabnikom. Vrni None, če ga ni."""
+    uporabnisko_ime = bottle.request.get_cookie("uporabnisko_ime", secret=SKRIVNOST)
+    return integrator.poisci_uporabnika(uporabnisko_ime)
+
+
 @bottle.route("/uvodna-stran/")
 def uvodna_stran():
+    if poisci_trenutnega_uporabnika() is not None:
+        bottle.redirect("/")
     return bottle.template("uvodna-stran.html")
 
 
 @bottle.route("/")
 def index():
-    bottle.redirect("/uvodna-stran/")
+    uporabnik = poisci_trenutnega_uporabnika()
+    if uporabnik is None:
+        bottle.redirect("/uvodna-stran/")
+    return bottle.template("index.html", uporabnik=uporabnik)
 
 
 @bottle.get("/prijava/")
-def stran_za_prijavo():
-    return bottle.template("prijava.html")
+def stran_za_prijavo(napaka=""):
+    return bottle.template("prijava.html", napaka=napaka)
+
+
+@bottle.post("/prijava/")
+def prijava():
+    uporabnisko_ime = bottle.request.forms.getunicode("uporabnisko_ime")
+    geslo = bottle.request.forms.getunicode("geslo")
+    uporabnik = integrator.poisci_uporabnika(uporabnisko_ime)
+    if uporabnik is None:
+        return stran_za_prijavo(napaka="Ni uporabnika s tem imenom.")
+    if not uporabnik.preveri_geslo(geslo):
+        return stran_za_prijavo(napaka="Napačno geslo.")
+    bottle.response.set_cookie("uporabnisko_ime", uporabnik.uporabnisko_ime, path="/", secret=SKRIVNOST)
+    bottle.redirect("/")
+
+
+@bottle.route("/odjava/")
+def odjava():
+    uporabnik = poisci_trenutnega_uporabnika()
+    if uporabnik is not None:
+        bottle.response.delete_cookie("uporabnisko_ime", path="/")
+    bottle.redirect("/uvodna-stran/")
 
 
 @bottle.get("/registracija/")
@@ -49,10 +81,12 @@ def stran_za_registracijo(napaka=""):
 @bottle.post("/registracija/")
 def registracija():
     uporabnisko_ime = bottle.request.forms.getunicode("uporabnisko_ime")
-    geslo = bottle.request.forms.get("geslo")
+    geslo = bottle.request.forms.getunicode("geslo")
     uporabnik = integrator.poisci_uporabnika(uporabnisko_ime)
+    if not uporabnisko_ime or not geslo:
+        return stran_za_registracijo(napaka="Prazno uporabniško ime ali geslo.")
     if uporabnik is not None:
-        return stran_za_registracijo("Uporabnik s tem imenom že obstaja.")
+        return stran_za_registracijo(napaka="Uporabnik s tem imenom že obstaja.")
     integrator.ustvari_uporabnika(uporabnisko_ime, geslo)
     bottle.response.set_cookie("uporabnisko_ime", uporabnisko_ime, path="/", secret=SKRIVNOST)
     bottle.redirect("/")
