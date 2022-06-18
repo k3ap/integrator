@@ -1,0 +1,38 @@
+% rebase('base.html')
+
+<div class="row">
+    
+    <div class="col s10 offset-s1">
+
+        {{!base}}
+
+        <p>
+            Dana je funkcija
+            $$f'(x) = {{ naloga.odvedena_funkcija.niz }}$$
+        </p>
+
+        <p>
+            % include('_naloga_graf.html')
+        </p>
+        
+        <form method="post">
+            <div class="row">
+                Zapišite predpis za \( f(x) \)
+                <div class="col s12">
+                    <div class="input-field">
+                        <input id="funkcija" name="funkcija" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="right">
+                    <button class="btn waves-effect waves-light brown" type="submit" name="action">
+                        Pošlji
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>

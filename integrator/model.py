@@ -67,15 +67,19 @@ class Funkcija(ShranljivObjekt):
     # Parser za spremembo niza v 'pravo' funkcijo potrebujemo konstruirati le enkrat
     _parser = None
 
-    def __init__(self, niz=None, slovar=None):
+    def __init__(self, niz=None, obmocje=None, slovar=None):
         super(Funkcija, self).__init__(slovar=slovar)
-        if slovar is not None and "niz" in slovar:
-            niz = slovar["niz"]
+        if slovar is not None:
+            if "niz" in slovar:
+                niz = slovar["niz"]
+            if "obmocje" in slovar:
+                obmocje = list(slovar["obmocje"])
 
-        if niz is None:
+        if any(var is None for var in [niz, obmocje]):
             raise ValueError("Niz ni bil podan.")
 
         self.niz = niz
+        self.obmocje = obmocje
 
         # Izraz, ki ga lahko evaluiramo
         self._izraz = None
@@ -83,7 +87,8 @@ class Funkcija(ShranljivObjekt):
     def shrani_v_slovar(self):
         slovar = super(Funkcija, self).shrani_v_slovar()
         slovar.update({
-            "niz": self.niz
+            "niz": self.niz,
+            "obmocje": self.obmocje
         })
         return slovar
 
@@ -92,14 +97,12 @@ class Funkcija(ShranljivObjekt):
         """Ustvari funkcijo iz neznanih podatkov; lahko je slovar, niz ali Funkcija"""
         if isinstance(podatki, Funkcija):
             return podatki
-        if isinstance(podatki, str):
-            return Funkcija(niz=podatki)
         if isinstance(podatki, dict):
             return Funkcija(slovar=podatki)
         raise ValueError(f"{podatki} ne ustvari veljavne funkcije.")
 
     def __str__(self):
-        return f"Funkcija {self.niz}"
+        return f"Funkcija {self.niz} na {self.obmocje}"
 
     @classmethod
     def _pridobi_parser(cls):
@@ -115,19 +118,19 @@ class Funkcija(ShranljivObjekt):
             self._izraz = funkcije.ustvari_izraz(self.niz, self._pridobi_parser())
         return self._izraz
 
-    def narisi_graf(self, obmocje, ime_datoteke):
+    def narisi_graf(self, ime_datoteke):
         """Nariši graf funkcije na podanem območju in ga shrani v datoteko"""
-        funkcije.narisi_graf(self.izraz, obmocje, ime_datoteke)
+        funkcije.narisi_graf(self.izraz, self.obmocje, ime_datoteke)
 
     def izracunaj_odvod(self, tocka):
         """Izračunaj približek odvoda v točki."""
         return funkcije.izracunaj_odvod(self.izraz, tocka)
 
-    def narisi_odvod(self, obmocje, ime_datoteke):
+    def narisi_odvod(self, ime_datoteke):
         """Nariši graf odvoda na območju in ga shrani v datoteko."""
         xs = []
         ys = []
-        for x in linspace(obmocje[0], obmocje[1]):
+        for x in linspace(self.obmocje[0], self.obmocje[1]):
             xs.append(x)
             ys.append(self.izracunaj_odvod(x))
 
@@ -284,12 +287,38 @@ class Integrator(ShranljivObjekt):
         """Ustvari novega uporabnika."""
         self.uporabniki.append(Uporabnik.ustvari_uporabnika(uporabnisko_ime, geslo))
 
+    def poisci_funkcijo(self, id_funkcije):
+        """Poišči in vrni funkcijo z danim ID-jem. Če ne obstaja, vrni None."""
+
+        # TODO Polepšaj
+
+        # Imamo dve možni lokaciji funkcij; kot del naloge ali kot oddaja
+        # Prvo pogledamo naloge
+        for naloga in self.naloge:
+            if naloga.odvedena_funkcija._id == id_funkcije:
+                return naloga.odvedena_funkcija
+
+        # Sedaj še oddaje
+        for uporabnik in self.uporabniki:
+            for oddaja in uporabnik.oddaje:
+                if oddaja.funkcija._id == id_funkcije:
+                    return oddaja.funkcija
+
+        return None
+
+    def poisci_nalogo(self, zaporedna_stevilka):
+        """Vrni nalogo z dano zaporedno številko, ali None, če taka naloga ne obstaja."""
+        for naloga in self.naloge:
+            if naloga.zaporedna_stevilka == zaporedna_stevilka:
+                return naloga
+        return None
+
 
 if __name__ == "__main__":
     primer = Integrator.ustvari_iz_datoteke("primer.json")
     primer.uporabniki.append(Uporabnik.ustvari_uporabnika("janez", "novak"))
-    funkcija = Funkcija("2*x")
-    integrirana = Funkcija("x^2 + 3")
+    funkcija = Funkcija("2*x", [-5, 5])
+    integrirana = Funkcija("x^2 + 3", [-5, 5])
     primer.naloge.append(Naloga("primer.html", funkcija, 1))
     primer.uporabniki[0].oddaje.append(Oddaja(
         primer.naloge[0]._id,
@@ -300,5 +329,5 @@ if __name__ == "__main__":
     primer.shrani_v_datoteko("prebavljen_primer.json")
 
     # funkcija.narisi_graf([-5, 5], "primer.png")
-    integrirana.narisi_odvod([-5, 5], "primer.png")
+    integrirana.narisi_odvod("primer.png")
 

@@ -5,3 +5,4 @@ prebavljen_primer.json
 __pycache__/
 integrator/SKRIVNOST
 db.json
+grafi/*.png

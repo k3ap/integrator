@@ -1,5 +1,15 @@
 {
-  "naloge": [],
-  "uporabniki": [
-  ]
+  "naloge": [
+    {
+      "ime_templata": "splosna_naloga.html",
+      "_id": "WIwWbh9oH1LGFQGH",
+      "odvedena_funkcija": {
+        "_id": "ZHNji6dgrAyM5Qan",
+        "niz": "2*x",
+        "obmocje": [-5, 5]
+      },
+      "zaporedna_stevilka": "1"
+    }
+  ],
+  "uporabniki": []
 }

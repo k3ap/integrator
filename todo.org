@@ -1,3 +1,9 @@
-* TODO Polepšaj naslov na spletni strani
+* TODO Naloge
+** TODO Dodaj naloge
+
+* TODO Izgled
+** TODO Polepšaj naslov na spletni strani
+** TODO Grafi funkcij naj bodo lepo označeni
+
 * TODO Dodaj uvodno besedilo
 * TODO Obrazec za spremembo gesla

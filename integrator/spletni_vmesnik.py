@@ -17,6 +17,11 @@ if not os.path.exists(DATOTEKA_Z_BAZO_PODATKOV):
 integrator = model.Integrator.ustvari_iz_datoteke(DATOTEKA_Z_BAZO_PODATKOV)
 
 
+# Ustvari direktorij za shranjevanje slik grafov, če ta še ne obstaja
+if not os.path.exists("grafi/"):
+    os.mkdir("grafi")
+
+
 # Preberi skrivnost ali jo ustvari, če še ne obstaja
 if not os.path.exists("SKRIVNOST"):
     with open("SKRIVNOST", "w") as f:
@@ -90,6 +95,37 @@ def registracija():
     integrator.ustvari_uporabnika(uporabnisko_ime, geslo)
     bottle.response.set_cookie("uporabnisko_ime", uporabnisko_ime, path="/", secret=SKRIVNOST)
     bottle.redirect("/")
+
+
+@bottle.route("/graf/<id_funkcije>/")
+def graf(id_funkcije):
+    """Vrne narisan graf funkcije kot statično datoteko. Slike grafov si shranjuje."""
+    funkcija = integrator.poisci_funkcijo(id_funkcije)
+
+    if funkcija is None:
+        bottle.abort(404, "Ni take funkcije")
+
+    if not os.path.exists(f"grafi/{id_funkcije}.png"):
+        funkcija.narisi_graf(f"grafi/{id_funkcije}.png")
+
+    return bottle.static_file(f"{id_funkcije}.png", "grafi")
+
+
+@bottle.get("/naloga/<zaporedna_stevilka:int>")
+def stran_z_nalogo(zaporedna_stevilka):
+    """Stran z besedilom naloge"""
+
+    uporabnik = poisci_trenutnega_uporabnika()
+    if not uporabnik:
+        bottle.redirect("/uvodna-stran/")
+
+    # želimo, da je številka, v bazi pa so kljub temu shranjene kot stringi
+    zaporedna_stevilka = str(zaporedna_stevilka)
+
+    naloga = integrator.poisci_nalogo(zaporedna_stevilka=zaporedna_stevilka)
+    if naloga is None:
+        bottle.abort(404, "Ta naloga ne obstaja")
+    return bottle.template(naloga.ime_templata, naloga=naloga)
 
 
 if __name__ == "__main__":
