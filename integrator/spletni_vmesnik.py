@@ -37,6 +37,14 @@ def poisci_trenutnega_uporabnika():
     return integrator.poisci_uporabnika(uporabnisko_ime)
 
 
+def poisci_trenutnega_uporabnika_ali_redirect(url="/uvodna-stran/"):
+    """Pomožna funkcija; če poisci_trenutnega_uporabnika vrne None, ta funkcija napravi redirect."""
+    uporabnik = poisci_trenutnega_uporabnika()
+    if uporabnik is None:
+        bottle.redirect(url)
+    return uporabnik
+
+
 @bottle.route("/uvodna-stran/")
 def uvodna_stran():
     if poisci_trenutnega_uporabnika() is not None:
@@ -46,9 +54,7 @@ def uvodna_stran():
 
 @bottle.route("/")
 def index():
-    uporabnik = poisci_trenutnega_uporabnika()
-    if uporabnik is None:
-        bottle.redirect("/uvodna-stran/")
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
     return bottle.template("index.html", uporabnik=uporabnik)
 
 
@@ -115,9 +121,7 @@ def graf(id_funkcije):
 def stran_z_nalogo(zaporedna_stevilka):
     """Stran z besedilom naloge"""
 
-    uporabnik = poisci_trenutnega_uporabnika()
-    if not uporabnik:
-        bottle.redirect("/uvodna-stran/")
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
 
     # želimo, da je številka, v bazi pa so kljub temu shranjene kot stringi
     zaporedna_stevilka = str(zaporedna_stevilka)
@@ -126,6 +130,16 @@ def stran_z_nalogo(zaporedna_stevilka):
     if naloga is None:
         bottle.abort(404, "Ta naloga ne obstaja")
     return bottle.template(naloga.ime_templata, naloga=naloga)
+
+
+@bottle.post("/naloga/<zaporedna_stevilka:int>")
+def oddaja_naloge(zaporedna_stevilka):
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
+    if "funkcija" not in bottle.request.forms or not bottle.request.forms["funkcija"]:
+        bottle.abort(400, "Ni oddane funkcije.")
+    funkcijski_niz = bottle.request.forms["funkcija"]
+    rezultat = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
+    return bottle.template("rezultat_oddaje.html", predpis_funkcije=funkcijski_niz, rezultat=rezultat)
 
 
 if __name__ == "__main__":

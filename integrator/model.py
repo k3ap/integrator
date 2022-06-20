@@ -1,3 +1,4 @@
+import math
 import string
 from random import choice as random_choice
 import json
@@ -136,33 +137,90 @@ class Funkcija(ShranljivObjekt):
 
         funkcije.narisi_graf_iz_tock(xs, ys, ime_datoteke)
 
+    def evaluiraj(self, x):
+        """Evaluiraj funkcijo v x."""
+        return funkcije.evaluiraj_izraz(self.izraz, x)
+
 
 class Naloga(ShranljivObjekt):
-    def __init__(self, ime_templata=None, odvedena_funkcija=None, zaporedna_stevilka=None, slovar=None):
+    def __init__(
+            self,
+            ime_templata=None,
+            odvedena_funkcija=None,
+            zaporedna_stevilka=None,
+            tocke_za_preverjanje=None,
+            slovar=None):
+
         super(Naloga, self).__init__(slovar=slovar)
         if slovar is not None:
             ime_templata = slovar.get("ime_templata", ime_templata)
             odvedena_funkcija = slovar.get("odvedena_funkcija", odvedena_funkcija)
             zaporedna_stevilka = slovar.get("zaporedna_stevilka", zaporedna_stevilka)
+            tocke_za_preverjanje = slovar.get("tocke_za_preverjanje", tocke_za_preverjanje)
 
-        if any(var is None for var in [ime_templata, odvedena_funkcija, zaporedna_stevilka]):
+        if any(var is None for var in [ime_templata, odvedena_funkcija, zaporedna_stevilka, tocke_za_preverjanje]):
             raise ValueError("Ni dovolj podatkov za izgradnjo Naloge")
 
         self.ime_templata = ime_templata
         self.zaporedna_stevilka = zaporedna_stevilka
         self.odvedena_funkcija = Funkcija.ustvari_funkcijo(odvedena_funkcija)
 
+        # tocke_za_preverjanje je seznam parov (x, teza), kjer je x koordinata, teza pa pove, kolikšen delež
+        # vseh odstotkov pripada tej točki
+        self.tocke_za_preverjanje = tocke_za_preverjanje
+
     def shrani_v_slovar(self):
         slovar = super(Naloga, self).shrani_v_slovar()
         slovar.update({
             "ime_templata": self.ime_templata,
             "odvedena_funkcija": self.odvedena_funkcija.shrani_v_slovar(),
-            "zaporedna_stevilka": self.zaporedna_stevilka
+            "zaporedna_stevilka": self.zaporedna_stevilka,
+            "tocke_za_preverjanje": self.tocke_za_preverjanje,
         })
         return slovar
 
     def __str__(self):
         return f"Naloga {self.zaporedna_stevilka} ({self.ime_templata})"
+
+    def oceni_oddajo(self, oddana_funkcija: Funkcija):
+        """Oceni oddano funkcijo in vrni številsko vrednost pridobljenih točk."""
+
+        # Ocenjevanje poteka po kriteriju; ta vsebuje pare (meja, vrednost)
+        # če se prava funkcija in odvod oddane funkcije v neki
+        # točki razlikujeta za manj kot meja, potem dobi oddaja za to točko vrednost% možnih točk
+        KRITERIJ = [
+            (1e-5, 100),
+            (1e-3, 90),
+            (1e-1, 60),
+            (1e0, 30),
+            (1e1, 10),
+            (math.inf, 0)
+        ]
+
+        skupna_teza = sum(teza for __, teza in self.tocke_za_preverjanje)
+        skupne_tocke = 0
+
+        for x, teza in self.tocke_za_preverjanje:
+            y1 = self.odvedena_funkcija.evaluiraj(x)
+            y2 = oddana_funkcija.izracunaj_odvod(x)
+
+            if y1 == y2:
+                # primer, ko sta obe števili neskončni, moramo obravnavati posebaj
+                skupne_tocke += teza
+                continue
+
+            delta = float(abs(y1 - y2))
+
+            if math.isinf(delta) or math.isnan(delta):
+                # Neskončna razlika pomeni 0 točk
+                continue
+
+            for meja, vrednost in KRITERIJ:
+                if delta < meja * max(abs(y1) + abs(y2), 1):
+                    skupne_tocke += teza * vrednost / 100
+                    break
+
+        return round(skupne_tocke * 100 / skupna_teza)
 
 
 class Oddaja(ShranljivObjekt):
@@ -173,14 +231,14 @@ class Oddaja(ShranljivObjekt):
             naloga = slovar.get("naloga", naloga)
             funkcija = slovar.get("funkcija", funkcija)
             cas_oddaje = slovar.get("cas_oddaje", cas_oddaje)
-            rezultat = slovar.gete("rezultat", rezultat)
+            rezultat = slovar.get("rezultat", rezultat)
 
         if any(var is None for var in [naloga, funkcija, cas_oddaje, rezultat]):
             raise ValueError("Ni dovolj podatkov za izgradnjo Oddaje")
 
         self.naloga = naloga  # id naloge (str)
         self.funkcija = Funkcija.ustvari_funkcijo(funkcija)
-        self.cas_oddaje = datetime.fromisoformat(cas_oddaje)
+        self.cas_oddaje = datetime.fromisoformat(cas_oddaje) if isinstance(cas_oddaje, str) else cas_oddaje
         self.rezultat = rezultat  # int (0-100)
 
     def shrani_v_slovar(self):
@@ -191,6 +249,7 @@ class Oddaja(ShranljivObjekt):
             "cas_oddaje": self.cas_oddaje.isoformat(),
             "rezultat": self.rezultat
         })
+        return slovar
 
     def __str__(self):
         return f"Oddaja za nalogo {self.naloga} s funkcijo {self.funkcija}"
@@ -252,6 +311,15 @@ class Uporabnik(ShranljivObjekt):
         """Vrne True, če je geslo pravilno za tega uporabnika, in False sicer."""
         return self.razprsitev == self.razprsi(geslo, self.sol)
 
+    def ustvari_oddajo(self, id_naloge, oddana_funkcija, cas_oddaje, rezultat):
+        """Ustvari novo oddajo in jo dodaj v svoj seznam."""
+        self.oddaje.append(Oddaja(
+            id_naloge,
+            oddana_funkcija,
+            cas_oddaje,
+            rezultat
+        ))
+
 
 class Integrator(ShranljivObjekt):
     def __init__(self, naloge=None, uporabniki=None, slovar=None):
@@ -312,6 +380,18 @@ class Integrator(ShranljivObjekt):
             if naloga.zaporedna_stevilka == zaporedna_stevilka:
                 return naloga
         return None
+
+    def dodaj_oddajo(self, stevilka_naloge: int, uporabnik: Uporabnik, funkcijski_niz: str):
+        """Doda in oceni novo oddajo, vrne oceno kot število. Vrne None, če je prišlo do težave (ni naloge, ...)"""
+        stevilka_naloge = str(stevilka_naloge)
+        naloga = self.poisci_nalogo(stevilka_naloge)
+        if naloga is None:
+            return None
+
+        funkcija = Funkcija(funkcijski_niz, naloga.odvedena_funkcija.obmocje)
+        tocke = naloga.oceni_oddajo(funkcija)
+        uporabnik.ustvari_oddajo(naloga._id, funkcija, datetime.now(), tocke)
+        return tocke
 
 
 if __name__ == "__main__":

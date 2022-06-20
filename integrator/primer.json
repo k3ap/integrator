@@ -8,7 +8,8 @@
         "niz": "2*x",
         "obmocje": [-5, 5]
       },
-      "zaporedna_stevilka": "1"
+      "zaporedna_stevilka": "1",
+      "tocke_za_preverjanje": [[0, 1], [7, 1], [-7, 1], [1e10, 1], [-1e10, 1]]
     }
   ],
   "uporabniki": []

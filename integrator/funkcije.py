@@ -150,7 +150,10 @@ def evaluiraj_izraz(izraz: list, x: float):
 
     kontekst = dict(KONSTANTE)
     kontekst["x"] = x
-    return rekurzivna_evalvacija(izraz, kontekst)
+    try:
+        return rekurzivna_evalvacija(izraz, kontekst)
+    except (OverflowError, ZeroDivisionError):
+        return math.inf
 
 
 def narisi_graf_iz_tock(x_tocke, y_tocke, ime_datoteke):
@@ -182,7 +185,7 @@ def narisi_graf(izraz, obmocje, ime_datoteke):
 
 def izracunaj_odvod(izraz, tocka):
     """Izračunaj numerični približek odvoda izraza v dani točki."""
-    EPS = 1e-5
+    EPS = 1e-6 * max(abs(tocka), 1)
 
     desno = evaluiraj_izraz(izraz, tocka+EPS)
     levo = evaluiraj_izraz(izraz, tocka-EPS)
