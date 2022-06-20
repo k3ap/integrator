@@ -4,6 +4,8 @@
 * TODO Izgled
 ** TODO Polepšaj naslov na spletni strani
 ** TODO Grafi funkcij naj bodo lepo označeni
+** TODO Na strani naloge naj bodo stare oddaje
 
 * TODO Dodaj uvodno besedilo
 * TODO Obrazec za spremembo gesla
+* TODO todoji v kodi
