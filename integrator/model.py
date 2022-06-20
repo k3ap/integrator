@@ -376,22 +376,24 @@ class Integrator(ShranljivObjekt):
 
     def poisci_nalogo(self, zaporedna_stevilka):
         """Vrni nalogo z dano zaporedno številko, ali None, če taka naloga ne obstaja."""
+        zaporedna_stevilka = str(zaporedna_stevilka)
         for naloga in self.naloge:
             if naloga.zaporedna_stevilka == zaporedna_stevilka:
                 return naloga
         return None
 
     def dodaj_oddajo(self, stevilka_naloge: int, uporabnik: Uporabnik, funkcijski_niz: str):
-        """Doda in oceni novo oddajo, vrne oceno kot število. Vrne None, če je prišlo do težave (ni naloge, ...)"""
+        """Doda in oceni novo oddajo, vrne oceno kot število, ter izgrajeno funkcijo.
+        Vrne (None, None), če je prišlo do težave (ni naloge, ...)"""
         stevilka_naloge = str(stevilka_naloge)
         naloga = self.poisci_nalogo(stevilka_naloge)
         if naloga is None:
-            return None
+            return None, None
 
         funkcija = Funkcija(funkcijski_niz, naloga.odvedena_funkcija.obmocje)
         tocke = naloga.oceni_oddajo(funkcija)
         uporabnik.ustvari_oddajo(naloga._id, funkcija, datetime.now(), tocke)
-        return tocke
+        return tocke, funkcija
 
 
 if __name__ == "__main__":

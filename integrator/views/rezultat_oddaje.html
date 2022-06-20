@@ -1,5 +1,64 @@
-% rebase('base.html', naslov="Oddaja naloge")
+% rebase('base.html')
 
-<p>
-    S funkcijo $$f(x) = {{ predpis_funkcije }}$$ ste dosegli {{ rezultat }} točk.
-</p>
+<div class="row center-align flow-text">
+    S funkcijo \( f(x) = {{ funkcija.niz }} \) ste dosegli rezultat
+
+    % if rezultat >= meja_za_nadaljevanje:
+    <div class="green-text">
+    % else:
+    <div class="red-text">
+    % end
+        
+        <h1>{{ rezultat }}</h1>
+    </div>
+
+    % if rezultat >= meja_za_nadaljevanje:
+    Čestitke!
+    % else:
+    Poskusite znova!
+    % end
+</div>
+
+<div class="row">
+    <div class="col s6">
+        <div class="row center-align">
+            Odvod oddane funkcije
+        </div>
+        <div class="row">
+            % include('_graf.html', id_funkcije=(funkcija._id + '/odvod'))
+        </div>
+    </div>
+    <div class="col s6">
+        <div class="row center-align">
+            Funkcija iz naloge
+        </div>
+        <div class="row">
+            % include('_graf.html', id_funkcije=naloga.odvedena_funkcija._id)
+        </div>
+    </div>
+</div>
+
+<div class="row center-align">
+    <a href="/naloga/{{ naloga.zaporedna_stevilka }}">
+        <button class="btn waves-effect waves-light brown">
+            Nazaj na nalogo
+            <i class="material-icons left">arrow_back</i>
+        </button>
+    </a>
+
+    <a href="/">
+        <button class="btn waves-effect waves-light brown">
+            Pregled nalog
+            <i class="material-icons left">dashboard</i>
+        </button>
+    </a>
+
+    % if rezultat >= meja_za_nadaljevanje:
+    <a href="/naloga/{{ int(naloga.zaporedna_stevilka) + 1 }}">
+        <button class="btn waves-effect waves-light brown">
+            Naslednja naloga
+            <i class="material-icons right">arrow_forward</i>
+        </button>
+    </a>
+    % end
+</div>

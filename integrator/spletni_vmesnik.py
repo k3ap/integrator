@@ -7,6 +7,7 @@ import model
 
 
 DATOTEKA_Z_BAZO_PODATKOV = "db.json"
+MEJA_ZA_NADALJEVANJE = 80   # meja, po kateri so funkcije 'pravilne' in program dovoljuje nadaljevanje
 
 # Preberi podatke iz baze
 
@@ -117,6 +118,19 @@ def graf(id_funkcije):
     return bottle.static_file(f"{id_funkcije}.png", "grafi")
 
 
+@bottle.route("/graf/<id_funkcije>/odvod/")
+def graf_odvoda(id_funkcije):
+    """Vrne narisan graf odvoda funkcije"""
+    funkcija = integrator.poisci_funkcijo(id_funkcije)
+    if funkcija is None:
+        bottle.abort(404, "Ni take funkcije")
+
+    if not os.path.exists(f"grafi/{id_funkcije}_odvod.png"):
+        funkcija.narisi_odvod(f"grafi/{id_funkcije}_odvod.png")
+
+    return bottle.static_file(f"{id_funkcije}_odvod.png", "grafi")
+
+
 @bottle.get("/naloga/<zaporedna_stevilka:int>")
 def stran_z_nalogo(zaporedna_stevilka):
     """Stran z besedilom naloge"""
@@ -138,8 +152,20 @@ def oddaja_naloge(zaporedna_stevilka):
     if "funkcija" not in bottle.request.forms or not bottle.request.forms["funkcija"]:
         bottle.abort(400, "Ni oddane funkcije.")
     funkcijski_niz = bottle.request.forms["funkcija"]
-    rezultat = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
-    return bottle.template("rezultat_oddaje.html", predpis_funkcije=funkcijski_niz, rezultat=rezultat)
+    rezultat, funkcija = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
+    if rezultat is None:
+        # TODO: lepa spletna stran, ki razloži, da imaš napačno sintakso
+        bottle.abort(400, "Napaka v funkciji")
+    return bottle.template(
+        "rezultat_oddaje.html",
+        funkcija=funkcija, rezultat=rezultat,
+        naloga=integrator.poisci_nalogo(zaporedna_stevilka), meja_za_nadaljevanje=MEJA_ZA_NADALJEVANJE
+    )
+
+
+@bottle.route("/static/<datoteka:path>")
+def staticne_datoteke(datoteka):
+    return bottle.static_file(datoteka, "static")
 
 
 if __name__ == "__main__":
