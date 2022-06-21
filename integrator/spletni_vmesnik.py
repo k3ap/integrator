@@ -97,9 +97,12 @@ def pregled_oddaje(id_oddaje):
 
     return bottle.template(
         "rezultat_oddaje.html",
-        funkcija=oddaja.funkcija, rezultat=oddaja.rezultat,
-        naloga=integrator.poisci_nalogo(_id=oddaja.naloga), meja_za_nadaljevanje=MEJA_ZA_NADALJEVANJE,
-        gumb_za_nadaljevanje=gumb_za_nadaljevanje
+        funkcija=oddaja.funkcija,
+        rezultat=oddaja.rezultat,
+        naloga=integrator.poisci_nalogo(_id=oddaja.naloga),
+        meja_za_nadaljevanje=MEJA_ZA_NADALJEVANJE,
+        gumb_za_nadaljevanje=gumb_za_nadaljevanje,
+        uporabnik=uporabnik
     )
 
 
