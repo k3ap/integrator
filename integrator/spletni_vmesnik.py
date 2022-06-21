@@ -8,6 +8,7 @@ import model
 
 DATOTEKA_Z_BAZO_PODATKOV = "db.json"
 MEJA_ZA_NADALJEVANJE = 80   # meja, po kateri so funkcije 'pravilne' in program dovoljuje nadaljevanje
+CASOVNI_FORMAT = "%H:%M %-d. %-m. %Y"
 
 # Preberi podatke iz baze
 
@@ -51,6 +52,55 @@ def uvodna_stran():
     if poisci_trenutnega_uporabnika() is not None:
         bottle.redirect("/")
     return bottle.template("uvodna-stran.html")
+
+
+@bottle.route("/pregled-oddaj/<zaporedna_stevilka:int>/")
+def pregled_oddaj(zaporedna_stevilka):
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
+
+    oddaje = []
+    for oddaja in uporabnik.oddaje:
+        naloga = integrator.poisci_nalogo(_id=oddaja.naloga).zaporedna_stevilka
+        if naloga != str(zaporedna_stevilka):
+            continue
+
+        oddaje.append((
+            oddaja._id,
+            oddaja.funkcija.niz,
+            oddaja.rezultat,
+            oddaja.cas_oddaje.strftime(CASOVNI_FORMAT),
+        ))
+
+    return bottle.template(
+        "pregled_oddaj.html",
+        uporabnik=uporabnik,
+        oddaje=oddaje,
+        meja_za_nadaljevanje=MEJA_ZA_NADALJEVANJE,
+        stevilka_naloge=zaporedna_stevilka
+    )
+
+
+@bottle.route("/pregled-oddaje/<id_oddaje>/")
+def pregled_oddaje(id_oddaje):
+    """Pregled uspešnosti posamične oddaje. gumb_za_naprej pove, če naj ima oddaja gumb za nadaljevanje,
+    četudi je morda neuspešna"""
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
+    oddaja = uporabnik.poisci_oddajo(_id=id_oddaje)
+    if oddaja is None:
+        bottle.abort(404, "Oddaja ni na voljo.")
+
+    # na strani naj se pokaže gumb za nadaljevanje, če katerakoli uporabnikova oddaja
+    # na tej nalogi dosega mejo
+    gumb_za_nadaljevanje = any(
+        o.rezultat >= MEJA_ZA_NADALJEVANJE for o in filter(lambda odd: odd.naloga == oddaja.naloga, uporabnik.oddaje)
+    )
+
+    return bottle.template(
+        "rezultat_oddaje.html",
+        funkcija=oddaja.funkcija, rezultat=oddaja.rezultat,
+        naloga=integrator.poisci_nalogo(_id=oddaja.naloga), meja_za_nadaljevanje=MEJA_ZA_NADALJEVANJE,
+        gumb_za_nadaljevanje=gumb_za_nadaljevanje
+    )
 
 
 @bottle.route("/")
@@ -143,7 +193,15 @@ def stran_z_nalogo(zaporedna_stevilka):
     naloga = integrator.poisci_nalogo(zaporedna_stevilka=zaporedna_stevilka)
     if naloga is None:
         bottle.abort(404, "Ta naloga ne obstaja")
-    return bottle.template(naloga.ime_templata, naloga=naloga)
+    return bottle.template(
+        naloga.ime_templata,
+        naloga=naloga,
+        prejsnje_oddaje=any(oddaja.naloga == naloga._id for oddaja in uporabnik.oddaje),
+        gumb_za_nadaljevanje=any(
+            oddaja.rezultat >= MEJA_ZA_NADALJEVANJE and oddaja.naloga == naloga._id for oddaja in uporabnik.oddaje
+        ),
+        uporabnik=uporabnik
+    )
 
 
 @bottle.post("/naloga/<zaporedna_stevilka:int>")
@@ -151,16 +209,15 @@ def oddaja_naloge(zaporedna_stevilka):
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
     if "funkcija" not in bottle.request.forms or not bottle.request.forms["funkcija"]:
         bottle.abort(400, "Ni oddane funkcije.")
+
     funkcijski_niz = bottle.request.forms["funkcija"]
-    rezultat, funkcija = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
-    if rezultat is None:
+    oddaja = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
+
+    if oddaja is None:
         # TODO: lepa spletna stran, ki razloži, da imaš napačno sintakso
         bottle.abort(400, "Napaka v funkciji")
-    return bottle.template(
-        "rezultat_oddaje.html",
-        funkcija=funkcija, rezultat=rezultat,
-        naloga=integrator.poisci_nalogo(zaporedna_stevilka), meja_za_nadaljevanje=MEJA_ZA_NADALJEVANJE
-    )
+
+    return pregled_oddaje(oddaja._id)
 
 
 @bottle.route("/static/<datoteka:path>")

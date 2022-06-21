@@ -6,6 +6,7 @@
 ** TODO Grafi funkcij naj bodo lepo označeni
 ** TODO Na strani naloge naj bodo stare oddaje
 ** TODO Pomanjšaj grafe
+** TODO Povezave med raznimi stranmi
 
 * TODO Dodaj uvodno besedilo
 * TODO Obrazec za spremembo gesla

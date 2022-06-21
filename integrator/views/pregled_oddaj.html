@@ -1,0 +1,31 @@
+% rebase('base.html', podnaslov='Pregled oddaj: Naloga ' + str(stevilka_naloge))
+
+<table class="highlight">
+    <thead>
+        <tr>
+            <th>Oddana funkcija</th>
+            <th>Rezultat</th>
+            <th>Čas oddaje</th>
+            <th>Povezava</th>
+        </tr>
+    </thead>
+    <tbody>
+        % for id_oddaje, funkcija, rezultat, cas in oddaje:
+            
+                <tr>
+                    
+                    <td>\( {{ funkcija }} \)</td>
+                    <td
+                    % if rezultat >= meja_za_nadaljevanje:
+                    class="green-text"
+                    % else:
+                    class="red-text"
+                    % end
+                    >{{ rezultat }}</td>
+                    <td>{{ cas }}</td>
+                    <td><a href="/pregled-oddaje/{{ id_oddaje }}/">Ogled</a></td>
+                </tr>
+            
+        % end
+    </tbody>
+</table>

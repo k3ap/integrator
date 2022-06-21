@@ -312,13 +312,21 @@ class Uporabnik(ShranljivObjekt):
         return self.razprsitev == self.razprsi(geslo, self.sol)
 
     def ustvari_oddajo(self, id_naloge, oddana_funkcija, cas_oddaje, rezultat):
-        """Ustvari novo oddajo in jo dodaj v svoj seznam."""
+        """Ustvari novo oddajo in jo dodaj v svoj seznam. Vrni novo oddajo."""
         self.oddaje.append(Oddaja(
             id_naloge,
             oddana_funkcija,
             cas_oddaje,
             rezultat
         ))
+        return self.oddaje[-1]
+
+    def poisci_oddajo(self, _id):
+        """Poišči oddajo ali vrni None, če ne obstaja"""
+        for oddaja in self.oddaje:
+            if oddaja._id == _id:
+                return oddaja
+        return None
 
 
 class Integrator(ShranljivObjekt):
@@ -374,26 +382,35 @@ class Integrator(ShranljivObjekt):
 
         return None
 
-    def poisci_nalogo(self, zaporedna_stevilka):
-        """Vrni nalogo z dano zaporedno številko, ali None, če taka naloga ne obstaja."""
-        zaporedna_stevilka = str(zaporedna_stevilka)
-        for naloga in self.naloge:
-            if naloga.zaporedna_stevilka == zaporedna_stevilka:
-                return naloga
+    def poisci_nalogo(self, zaporedna_stevilka=None, _id=None):
+        """Vrni nalogo z dano zaporedno številko oz. ID-jem, ali None, če taka naloga ne obstaja."""
+        if zaporedna_stevilka is not None:
+            zaporedna_stevilka = str(zaporedna_stevilka)
+            for naloga in self.naloge:
+                if naloga.zaporedna_stevilka == zaporedna_stevilka:
+                    return naloga
+            return None
+
+        if _id is not None:
+            for naloga in self.naloge:
+                if naloga._id == _id:
+                    return naloga
+            return None
+
         return None
 
     def dodaj_oddajo(self, stevilka_naloge: int, uporabnik: Uporabnik, funkcijski_niz: str):
-        """Doda in oceni novo oddajo, vrne oceno kot število, ter izgrajeno funkcijo.
-        Vrne (None, None), če je prišlo do težave (ni naloge, ...)"""
+        """Doda in oceni novo oddajo, vrne novo oddajo.
+        Vrne None, če je prišlo do težave (ni naloge, ...)"""
         stevilka_naloge = str(stevilka_naloge)
         naloga = self.poisci_nalogo(stevilka_naloge)
         if naloga is None:
-            return None, None
+            return None
 
         funkcija = Funkcija(funkcijski_niz, naloga.odvedena_funkcija.obmocje)
         tocke = naloga.oceni_oddajo(funkcija)
-        uporabnik.ustvari_oddajo(naloga._id, funkcija, datetime.now(), tocke)
-        return tocke, funkcija
+        oddaja = uporabnik.ustvari_oddajo(naloga._id, funkcija, datetime.now(), tocke)
+        return oddaja
 
 
 if __name__ == "__main__":
