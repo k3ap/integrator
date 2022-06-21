@@ -328,6 +328,10 @@ class Uporabnik(ShranljivObjekt):
                 return oddaja
         return None
 
+    def je_resil_nalogo(self, naloga: str, meja: int):
+        """Vrne True, če je vsaj ena uporabnikova oddaja pri nalogi dobila višji rezultat od meje."""
+        return any(oddaja.naloga == naloga and oddaja.rezultat >= meja for oddaja in self.oddaje)
+
 
 class Integrator(ShranljivObjekt):
     def __init__(self, naloge=None, uporabniki=None, slovar=None):

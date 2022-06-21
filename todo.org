@@ -1,5 +1,6 @@
 * TODO Naloge
 ** TODO Dodaj naloge
+** TODO Avtomatsko generiranje
 
 * TODO Izgled
 ** TODO Polepšaj naslov na spletni strani
@@ -11,3 +12,5 @@
 * TODO Dodaj uvodno besedilo
 * TODO Obrazec za spremembo gesla
 * TODO todoji v kodi
+* TODO Populiraj primer
+* TODO Pokomentiraj kodo

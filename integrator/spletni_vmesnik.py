@@ -47,6 +47,10 @@ def poisci_trenutnega_uporabnika_ali_redirect(url="/uvodna-stran/"):
     return uporabnik
 
 
+def napaka(besedilo):
+    return bottle.template("napaka.html", napaka=besedilo)
+
+
 @bottle.route("/uvodna-stran/")
 def uvodna_stran():
     if poisci_trenutnega_uporabnika() is not None:
@@ -91,9 +95,7 @@ def pregled_oddaje(id_oddaje):
 
     # na strani naj se pokaže gumb za nadaljevanje, če katerakoli uporabnikova oddaja
     # na tej nalogi dosega mejo
-    gumb_za_nadaljevanje = any(
-        o.rezultat >= MEJA_ZA_NADALJEVANJE for o in filter(lambda odd: odd.naloga == oddaja.naloga, uporabnik.oddaje)
-    )
+    gumb_za_nadaljevanje = uporabnik.je_resil_nalogo(oddaja.naloga, MEJA_ZA_NADALJEVANJE)
 
     return bottle.template(
         "rezultat_oddaje.html",
@@ -108,8 +110,52 @@ def pregled_oddaje(id_oddaje):
 
 @bottle.route("/")
 def index():
+    """Glavna stran. Prikaže tabelo rešenih nalog."""
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
-    return bottle.template("index.html", uporabnik=uporabnik)
+
+    # Ustvari seznam parov [naloga, status], kjer je status odvisen od rešitev:
+    # če je uporabnik nalogo rešil, je status "zeleno"
+    # če je uporabnik nalgoo poskusil, a neuspešno, je status "rdeče"
+    # če je uprabnik rešil vse naloge do te, te pa še ni poskusil, je status "modro"
+    # sicer je status "sivo"
+
+    def pridobi_status(naloga):
+        poskuseno = False
+        for oddaja in uporabnik.oddaje:
+            if oddaja.naloga == naloga._id:
+                poskuseno = True
+                if oddaja.rezultat >= MEJA_ZA_NADALJEVANJE:
+                    return "zeleno"
+
+        return "rdece" if poskuseno else "sivo"
+
+    naloge = [
+        [naloga.zaporedna_stevilka, pridobi_status(naloga)]
+        for naloga in integrator.naloge
+    ]
+
+    naloge.sort()
+
+    for i, par in enumerate(naloge):
+        if par[1] == "sivo" and naloge[i-1][1] == "zeleno":
+            par[1] = "modro"
+
+    # To se zgodi, ko uporabnik ni rešil še nobene naloge
+    if naloge[0][1] == "sivo":
+        naloge[0][1] = "modro"
+
+    vrstice = []
+    vrstica = []
+    for par in naloge:
+        vrstica.append(par)
+        if len(vrstica) == 5:
+            vrstice.append(vrstica)
+            vrstica = []
+
+    if vrstica:
+        vrstice.append(vrstica)
+
+    return bottle.template("index.html", uporabnik=uporabnik, vrstice=vrstice)
 
 
 @bottle.get("/prijava/")
@@ -184,14 +230,16 @@ def graf_odvoda(id_funkcije):
     return bottle.static_file(f"{id_funkcije}_odvod.png", "grafi")
 
 
-@bottle.get("/naloga/<zaporedna_stevilka:int>")
+@bottle.get("/naloga/<zaporedna_stevilka:int>/")
 def stran_z_nalogo(zaporedna_stevilka):
     """Stran z besedilom naloge"""
 
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
 
-    # želimo, da je številka, v bazi pa so kljub temu shranjene kot stringi
-    zaporedna_stevilka = str(zaporedna_stevilka)
+    if zaporedna_stevilka > 1 and \
+            not uporabnik.je_resil_nalogo(integrator.poisci_nalogo(zaporedna_stevilka-1)._id, MEJA_ZA_NADALJEVANJE):
+
+        return napaka("Da se lotite naloge, morate rešiti vse naloge pred njo.")
 
     naloga = integrator.poisci_nalogo(zaporedna_stevilka=zaporedna_stevilka)
     if naloga is None:
@@ -200,14 +248,12 @@ def stran_z_nalogo(zaporedna_stevilka):
         naloga.ime_templata,
         naloga=naloga,
         prejsnje_oddaje=any(oddaja.naloga == naloga._id for oddaja in uporabnik.oddaje),
-        gumb_za_nadaljevanje=any(
-            oddaja.rezultat >= MEJA_ZA_NADALJEVANJE and oddaja.naloga == naloga._id for oddaja in uporabnik.oddaje
-        ),
+        gumb_za_nadaljevanje=uporabnik.je_resil_nalogo(naloga._id, MEJA_ZA_NADALJEVANJE),
         uporabnik=uporabnik
     )
 
 
-@bottle.post("/naloga/<zaporedna_stevilka:int>")
+@bottle.post("/naloga/<zaporedna_stevilka:int>/")
 def oddaja_naloge(zaporedna_stevilka):
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
     if "funkcija" not in bottle.request.forms or not bottle.request.forms["funkcija"]:

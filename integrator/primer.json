@@ -10,6 +10,17 @@
       },
       "zaporedna_stevilka": "1",
       "tocke_za_preverjanje": [[0, 1], [7, 1], [-7, 1], [1e10, 1], [-1e10, 1]]
+    },
+    {
+      "ime_templata": "splosna_naloga.html",
+      "_id": "KIwWbh9oH2LGFQGH",
+      "odvedena_funkcija": {
+        "_id": "BHNji6dgrAyM5Qan",
+        "niz": "e^x",
+        "obmocje": [0, 3]
+      },
+      "zaporedna_stevilka": "2",
+      "tocke_za_preverjanje": [[0, 1], [2, 1], [1, 1], [1.5, 1], [0.5, 1]]
     }
   ],
   "uporabniki": []

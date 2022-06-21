@@ -1,3 +1,34 @@
-% rebase('base.html', naslov='indeks')
+% rebase('base.html')
 
-Indeks.
+<table class="flow-text">
+    <tbody>
+        % for vrstica in vrstice:
+            <tr>
+                % for naloga, status in vrstica:
+                    % if status == "zeleno":
+                        <td class="green lighten-1 center-align">
+                            <a href="/naloga/{{ naloga }}" class="green-text text-darken-3">        
+                                {{ naloga }}
+                            </a>
+                        </td>
+                        
+                    % elif status == "rdece":
+                        <td class="red center-align">
+                            <a href="/naloga/{{ naloga }}/" class="red-text text-darken-3">
+                                {{ naloga }}
+                            </a>
+                        </td>
+                    % elif status == "modro":
+                        <td class="blue-grey lighten-5 center-align">
+                            <a href="/naloga/{{ naloga }}/" class="blue-text">
+                                {{ naloga }}
+                            </a>
+                        </td>
+                    % else:
+                        <td class="grey lighten-1 white-text center-align">{{ naloga }}</td>
+                    % end
+                % end
+            </tr>
+        % end
+    </tbody>
+</table>
