@@ -4,8 +4,8 @@
 
 * TODO Izgled
 ** TODO Polepšaj naslov na spletni strani
+*** TODO Lepši logout text
 ** TODO Grafi funkcij naj bodo lepo označeni
-** TODO Na strani naloge naj bodo stare oddaje
 ** TODO Pomanjšaj grafe
 ** TODO Povezave med raznimi stranmi
 

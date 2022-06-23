@@ -200,7 +200,7 @@ def registracija():
         return stran_za_registracijo(napaka="Uporabnik s tem imenom že obstaja.")
     integrator.ustvari_uporabnika(uporabnisko_ime, geslo)
     bottle.response.set_cookie("uporabnisko_ime", uporabnisko_ime, path="/", secret=SKRIVNOST)
-    bottle.redirect("/")
+    bottle.redirect("/naloga/1/")
 
 
 @bottle.route("/graf/<id_funkcije>/")
