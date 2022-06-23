@@ -14,3 +14,4 @@
 * TODO todoji v kodi
 * TODO Populiraj primer
 * TODO Pokomentiraj kodo
+* TODO Odstrani janeza iz primera

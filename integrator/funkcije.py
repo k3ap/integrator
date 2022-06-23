@@ -9,10 +9,13 @@ from pomozne_funkcije import linspace
 FUNKCIJE = {
     "abs": abs,
     "acos": math.acos,
+    "arccos": math.acos,
     "acosh": math.acosh,
     "asin": math.asin,
+    "arcsin": math.asin,
     "asinh": math.asinh,
     "atan": math.atan,
+    "arctan": math.atan,
     "atanh": math.atanh,
     "ceil": math.ceil,
     "cos": math.cos,
@@ -39,7 +42,9 @@ FUNKCIJE = {
 KONSTANTE = {
     "pi": math.pi,
     "tau": math.tau,
-    "e": math.e
+    "e": math.e,
+    "c": 0,
+    "C": 0,
 }
 
 OPERACIJE = {

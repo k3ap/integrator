@@ -5,9 +5,86 @@ import json
 from datetime import datetime
 from hashlib import sha256
 import secrets
+import re
 
 import funkcije
 from pomozne_funkcije import linspace
+
+
+def predelaj_niz_za_latex(niz):
+    """Polepšaj niz, da bo bolje izgledal v latex-u"""
+
+    SUBSTITUCIJE = [
+        ("abs", "\\left|", "\\right|"),
+        ("acos", "\\arccos{(", "})"),
+        ("arccos", "\\arccos{(", "})"),
+        ("asin", "\\arcsin{(", "})"),
+        ("arcsin", "\\arcsin{(", "})"),
+        ("atan", "\\arctan{(", "})"),
+        ("arctan", "\\arctan{(", "})"),
+        ("cos", "\\cos{(...)}{(", "})"),
+        ("cosh", "\\cosh{(", "})"),
+        ("exp", "\\exp{(", "})"),
+        ("log", "\\log{(", "})"),
+        ("ln", "\\ln{(", "})"),
+        ("sin", "\\sin{(", "})"),
+        ("sinh", "\\sinh{(", "})"),
+        ("sqrt", "\\sqrt{(", "})"),
+        ("tan", "\\tan{(", "})"),
+        ("tanh", "\\tanh{(", "})"),
+        ("log10", "\\log_{10}{(", "})"),
+        ("log2", "\\log_2{(", "})"),
+    ]
+
+    # Poiščemo oklepaje, in si označimo, kje se začnejo, končajo, in katera funkcija je pred njimi
+    oklepaji = []
+    pari_oklepajev = []
+    ime_funkcije = ""
+    for i, ch in enumerate(niz):
+        if ch in string.ascii_letters + string.digits:
+            ime_funkcije += ch
+        elif ch == "(":
+            oklepaji.append((ime_funkcije, i))
+            ime_funkcije = ""
+        elif ch == ")":
+            if not oklepaji:
+                # Nekaj je šlo hudo narobe; to se res nebi smelo zgoditi na tej točki
+                raise ValueError("Malformed oklepaji v nizu")
+            ime, indeks = oklepaji.pop()
+            if ime:
+                pari_oklepajev.append((ime, indeks, i))
+            ime_funkcije = ""
+        else:
+            ime_funkcije = ""
+
+    # Sedaj zaupamo, da ne manjka noben zaklepaj; sicer bi se parser moral že zdavnaj pritožiti
+
+    zamenjave = []  # (kje se začne zamenjava, koliko za zamenjati, s čim zamenjati)
+    for ime, levi, desni in pari_oklepajev:
+        for ime_za_zamenjavo, leva_zamenjava, desna_zamenjava in SUBSTITUCIJE:
+            if ime_za_zamenjavo == ime:
+                break
+        else:
+            continue
+
+        zamenjave.append((levi-len(ime), len(ime)+1, leva_zamenjava))
+        zamenjave.append((desni, 1, desna_zamenjava))
+
+    zamenjave.sort()
+    indeks = 0  # indeks, do izključno katerega smo že obdelali vhodni niz
+    rezultat = ""
+    for idx, dolzina, zamenjava in zamenjave:
+        if indeks < idx:
+            rezultat += niz[indeks:idx]
+            indeks = idx
+
+        rezultat += zamenjava
+        indeks += dolzina
+
+    if indeks != len(niz):
+        rezultat += niz[indeks:len(niz)]
+
+    return rezultat
 
 
 class ShranljivObjekt:
@@ -104,6 +181,12 @@ class Funkcija(ShranljivObjekt):
 
     def __str__(self):
         return f"Funkcija {self.niz} na {self.obmocje}"
+
+    @property
+    def niz_latex(self):
+        """Vrni niz funkcije, polepšan za LaTeX izpis."""
+        return predelaj_niz_za_latex(self.niz)
+
 
     @classmethod
     def _pridobi_parser(cls):
