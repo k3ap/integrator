@@ -5,7 +5,6 @@ import json
 from datetime import datetime
 from hashlib import sha256
 import secrets
-import re
 
 import funkcije
 from pomozne_funkcije import linspace
@@ -34,6 +33,7 @@ def predelaj_niz_za_latex(niz):
         ("tanh", "\\tanh{(", "})"),
         ("log10", "\\log_{10}{(", "})"),
         ("log2", "\\log_2{(", "})"),
+        ("", "{(", ")}"),
     ]
 
     # Poiščemo oklepaje, in si označimo, kje se začnejo, končajo, in katera funkcija je pred njimi
@@ -51,8 +51,7 @@ def predelaj_niz_za_latex(niz):
                 # Nekaj je šlo hudo narobe; to se res nebi smelo zgoditi na tej točki
                 raise ValueError("Malformed oklepaji v nizu")
             ime, indeks = oklepaji.pop()
-            if ime:
-                pari_oklepajev.append((ime, indeks, i))
+            pari_oklepajev.append((ime, indeks, i))
             ime_funkcije = ""
         else:
             ime_funkcije = ""
