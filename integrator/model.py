@@ -265,7 +265,7 @@ class Naloga(ShranljivObjekt):
         return f"Naloga {self.zaporedna_stevilka} ({self.ime_templata})"
 
     def __lt__(self, o):
-        return self.zaporedna_stevilka < o.zaporedna_stevilka
+        return int(self.zaporedna_stevilka) < int(o.zaporedna_stevilka)
 
     def oceni_oddajo(self, oddana_funkcija: Funkcija):
         """Oceni oddano funkcijo in vrni številsko vrednost pridobljenih točk."""
