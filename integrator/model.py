@@ -397,6 +397,10 @@ class Uporabnik(ShranljivObjekt):
         """Vrne True, če je geslo pravilno za tega uporabnika, in False sicer."""
         return self.razprsitev == self.razprsi(geslo, self.sol)
 
+    def nastavi_geslo(self, novo_geslo: str):
+        """Nastavi geslo na novo vrednost"""
+        self.razprsitev = Uporabnik.razprsi(novo_geslo, self.sol)
+
     def ustvari_oddajo(self, id_naloge, oddana_funkcija, cas_oddaje, rezultat):
         """Ustvari novo oddajo in jo dodaj v svoj seznam. Vrni novo oddajo."""
         self.oddaje.append(Oddaja(

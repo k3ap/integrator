@@ -47,7 +47,7 @@ def poisci_trenutnega_uporabnika_ali_redirect(url="/uvodna-stran/"):
     return uporabnik
 
 
-def napaka(besedilo):
+def stran_za_napako(besedilo):
     return bottle.template("napaka.html", napaka=besedilo)
 
 
@@ -297,7 +297,7 @@ def stran_z_nalogo(zaporedna_stevilka, napaka=""):
     if zaporedna_stevilka > 1 and \
             not uporabnik.je_resil_nalogo(integrator.poisci_nalogo(zaporedna_stevilka-1)._id, MEJA_ZA_NADALJEVANJE):
 
-        return napaka("Da se lotite naloge, morate rešiti vse naloge pred njo.")
+        return stran_za_napako("Da se lotite naloge, morate rešiti vse naloge pred njo.")
 
     naloga = integrator.poisci_nalogo(zaporedna_stevilka=zaporedna_stevilka)
     if naloga is None:
@@ -316,7 +316,7 @@ def stran_z_nalogo(zaporedna_stevilka, napaka=""):
 def oddaja_naloge(zaporedna_stevilka):
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
     if "funkcija" not in bottle.request.forms or not bottle.request.forms["funkcija"]:
-        bottle.abort(400, "Ni oddane funkcije.")
+        return stran_z_nalogo(zaporedna_stevilka, napaka="Ni funkcije")
 
     funkcijski_niz = bottle.request.forms["funkcija"]
     oddaja = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
@@ -325,6 +325,22 @@ def oddaja_naloge(zaporedna_stevilka):
         return stran_z_nalogo(zaporedna_stevilka, napaka="Napaka pri branju funkcije; neveljavna sintaksa.")
 
     return pregled_oddaje(oddaja._id)
+
+
+@bottle.get("/sprememba-gesla/")
+def sprememba_gesla(napaka=""):
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
+    return bottle.template("sprememba_gesla.html", napaka=napaka, uporabnik=uporabnik)
+
+
+@bottle.post("/sprememba-gesla/")
+def spremeni_geslo():
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
+    staro_geslo = bottle.request.forms["staro_geslo"]
+    novo_geslo = bottle.request.forms["novo_geslo"]
+    if uporabnik.preveri_geslo(staro_geslo):
+        uporabnik.nastavi_geslo(novo_geslo)
+    bottle.redirect("/")
 
 
 @bottle.route("/static/<datoteka:path>")

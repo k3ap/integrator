@@ -3,12 +3,9 @@
 ** TODO Avtomatsko generiranje
 
 * TODO Izgled
-** TODO Grafi funkcij naj bodo lepo označeni
 ** TODO Povezave med raznimi stranmi
 ** TODO Gumbi na indeksu naj bodo večji
 
-* TODO Obrazec za spremembo gesla
-* TODO todoji v kodi
 * TODO Pokomentiraj kodo
 * TODO Odstrani janeza iz primera
 * TODO Časovno omeji evaluiraj_izraz
