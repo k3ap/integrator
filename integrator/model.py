@@ -29,7 +29,7 @@ def predelaj_niz_za_latex(niz):
         ("ln", "\\ln{(", "})"),
         ("sin", "\\sin{(", "})"),
         ("sinh", "\\sinh{(", "})"),
-        ("sqrt", "\\sqrt{(", "})"),
+        ("sqrt", "\\sqrt{", "}"),
         ("tan", "\\tan{(", "})"),
         ("tanh", "\\tanh{(", "})"),
         ("log10", "\\log_{10}{(", "})"),

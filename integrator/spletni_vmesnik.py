@@ -118,7 +118,7 @@ def pregled_oddaj(zaporedna_stevilka):
 
         oddaje.append((
             oddaja._id,
-            oddaja.funkcija.niz,
+            oddaja.funkcija.niz_latex,
             oddaja.rezultat,
             oddaja.cas_oddaje.strftime(CASOVNI_FORMAT),
         ))

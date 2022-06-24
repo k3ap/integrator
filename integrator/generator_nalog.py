@@ -3,8 +3,9 @@ import random
 
 import model
 
+DATOTEKA = "primer.json"
 
-integrator = model.Integrator.ustvari_iz_datoteke("primer.json")
+integrator = model.Integrator.ustvari_iz_datoteke(DATOTEKA)
 
 # Pridobi zaporedno številko naloge
 zaporedna_stevilka = max(int(naloga.zaporedna_stevilka) for naloga in integrator.naloge) + 1
@@ -83,4 +84,4 @@ nova_naloga = integrator.naloge.append(model.Naloga(
     tocke_za_preverjanje
 ))
 
-integrator.shrani_v_datoteko("primer.json")
+integrator.shrani_v_datoteko(DATOTEKA)
