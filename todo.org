@@ -3,14 +3,10 @@
 ** TODO Avtomatsko generiranje
 
 * TODO Izgled
-** TODO Polepšaj naslov na spletni strani
-*** TODO Lepši logout text
 ** TODO Grafi funkcij naj bodo lepo označeni
-** TODO Pomanjšaj grafe
 ** TODO Povezave med raznimi stranmi
 ** TODO Gumbi na indeksu naj bodo večji
 
-* TODO Dodaj uvodno besedilo
 * TODO Obrazec za spremembo gesla
 * TODO todoji v kodi
 * TODO Pokomentiraj kodo

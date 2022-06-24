@@ -37,10 +37,6 @@ FUNKCIJE = {
     "sqrt": math.sqrt,
     "tan": math.tan,
     "tanh": math.tanh,
-
-    # malce goljufije, ki pomaga kasneje v parsanju
-    "+": lambda x: x,
-    "-": lambda x: -x,
 }
 
 KONSTANTE = {
@@ -164,17 +160,26 @@ def evaluiraj_izraz(izraz: list, x: float):
 
         # Ena ali več levo asociranih binarnih operacij, ali klic funkcije
         leva_vrednost = izraz[0]
+        indeks = 1
+        levi_unarni = 1
+        while isinstance(leva_vrednost, str) and leva_vrednost in "+-":
+            levi_unarni *= {"+": 1, "-": -1}[leva_vrednost]
+            leva_vrednost = izraz[indeks]
+            indeks += 1
+
         if isinstance(leva_vrednost, str) and leva_vrednost in FUNKCIJE:
-            leva_vrednost = FUNKCIJE[leva_vrednost](rekurzivna_evalvacija(izraz[1], kontekst))
-            indeks = 2
+            leva_vrednost = FUNKCIJE[leva_vrednost](rekurzivna_evalvacija(izraz[indeks], kontekst))
+            indeks += 1
         else:
-            indeks = 1
             leva_vrednost = rekurzivna_evalvacija(leva_vrednost, kontekst)
+
+        leva_vrednost *= levi_unarni
 
         while indeks < len(izraz):
             operator = izraz[indeks]
-            desna_vrednost = izraz[indeks+1]
-            indeks += 2
+            indeks += 1
+            desna_vrednost = izraz[indeks]
+            indeks += 1
             if isinstance(desna_vrednost, str) and desna_vrednost in FUNKCIJE:
                 desna_vrednost = FUNKCIJE[desna_vrednost](rekurzivna_evalvacija(izraz[indeks], kontekst))
                 indeks += 1

@@ -1,16 +1,16 @@
 % rebase('base.html')
 
-<div class="row center-align flow-text">
+<div class="row center-align vecje-besedilo">
     S funkcijo \( f(x) = {{ funkcija.niz_latex }} \) ste dosegli rezultat
-
+    <br>
     % if rezultat >= meja_za_nadaljevanje:
-    <div class="green-text">
+    <span class="green-text">
     % else:
-    <div class="red-text">
+    <span class="red-text">
     % end
         
         <h1>{{ rezultat }}</h1>
-    </div>
+    </span>
 
     % if rezultat >= meja_za_nadaljevanje:
     Čestitke!
