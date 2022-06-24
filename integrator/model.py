@@ -6,6 +6,8 @@ from datetime import datetime
 from hashlib import sha256
 import secrets
 
+import pyparsing
+
 import funkcije
 from pomozne_funkcije import linspace
 
@@ -493,8 +495,12 @@ class Integrator(ShranljivObjekt):
         if naloga is None:
             return None
 
-        funkcija = Funkcija(funkcijski_niz, naloga.odvedena_funkcija.obmocje)
-        tocke = naloga.oceni_oddajo(funkcija)
+        try:
+            funkcija = Funkcija(funkcijski_niz, naloga.odvedena_funkcija.obmocje)
+            tocke = naloga.oceni_oddajo(funkcija)
+        except pyparsing.ParseException:
+            return None
+
         oddaja = uporabnik.ustvari_oddajo(naloga._id, funkcija, datetime.now(), tocke)
         return oddaja
 

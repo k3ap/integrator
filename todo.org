@@ -12,4 +12,3 @@
 * TODO Pokomentiraj kodo
 * TODO Odstrani janeza iz primera
 * TODO Časovno omeji evaluiraj_izraz
-* TODO Ugotovi, kaj narediti, če uporabnik napiše nekaj sintaktično narobe

@@ -289,7 +289,7 @@ def graf_oddaja(id_oddaje):
 
 
 @bottle.get("/naloga/<zaporedna_stevilka:int>/")
-def stran_z_nalogo(zaporedna_stevilka):
+def stran_z_nalogo(zaporedna_stevilka, napaka=""):
     """Stran z besedilom naloge"""
 
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
@@ -307,7 +307,8 @@ def stran_z_nalogo(zaporedna_stevilka):
         naloga=naloga,
         prejsnje_oddaje=any(oddaja.naloga == naloga._id for oddaja in uporabnik.oddaje),
         gumb_za_nadaljevanje=uporabnik.je_resil_nalogo(naloga._id, MEJA_ZA_NADALJEVANJE),
-        uporabnik=uporabnik
+        uporabnik=uporabnik,
+        napaka=napaka
     )
 
 
@@ -321,7 +322,7 @@ def oddaja_naloge(zaporedna_stevilka):
     oddaja = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
 
     if oddaja is None:
-        bottle.abort(400, "Napaka v funkciji")
+        return stran_z_nalogo(zaporedna_stevilka, napaka="Napaka pri branju funkcije; neveljavna sintaksa.")
 
     return pregled_oddaje(oddaja._id)
 
