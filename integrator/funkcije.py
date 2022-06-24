@@ -37,6 +37,10 @@ FUNKCIJE = {
     "sqrt": math.sqrt,
     "tan": math.tan,
     "tanh": math.tanh,
+
+    # malce goljufije, ki pomaga kasneje v parsanju
+    "+": lambda x: x,
+    "-": lambda x: -x,
 }
 
 KONSTANTE = {
@@ -56,40 +60,70 @@ OPERACIJE = {
 }
 
 
-def pridobi_parser():
-    """Ustvari in vrni razčlenjevalnik za procesiranje matematičnih izrazov."""
+# def pridobi_parser():
+#     """Ustvari in vrni razčlenjevalnik za procesiranje matematičnih izrazov."""
 
-    # Atomi
+#     # Atomi
+#     stevilka = pp.pyparsing_common.number
+#     spremenljivka = pp.Word(pp.alphas)
+#     # Operacije
+#     plusop = pp.oneOf("+ -")
+#     multop = pp.oneOf("* /")
+#     expop = pp.Literal("^")
+
+#     # Oklepaji
+#     levi_oklepaj, desni_oklepaj = map(pp.Suppress, "()")
+
+#     # Izraz je definiran rekurzivno, zato potrebujemo Forward()
+#     izraz = pp.Forward()
+
+#     klic_funkcije = pp.Word(pp.alphas, pp.alphanums) + levi_oklepaj + pp.Group(izraz) + desni_oklepaj
+#     operand = (
+#         pp.ZeroOrMore(plusop)   # unarni +/-
+#         + pp.Group(
+#             klic_funkcije | spremenljivka | stevilka | pp.Group(levi_oklepaj + izraz + desni_oklepaj)
+#         )
+#     )
+
+#     # Sloje ustvarimo po precedenci; najglobje v drevesu bodo eksponenti, potem produkti in potem vsote
+#     # (produkt vklučuje * in /, vsota pa + in -)
+#     eksponent = pp.Group(operand) + pp.ZeroOrMore(expop + pp.Group(operand))
+#     produkt = pp.Group(eksponent) + pp.ZeroOrMore(multop + pp.Group(eksponent))
+#     vsota = pp.Group(produkt) + pp.ZeroOrMore(plusop + pp.Group(produkt))
+
+#     izraz <<= vsota
+
+#     # TODO: Ugotovi, kako parsati `7x` oziroma `7 x` kot produkt
+
+#     return izraz
+
+
+def pridobi_parser():
     stevilka = pp.pyparsing_common.number
     spremenljivka = pp.Word(pp.alphas)
-    # Operacije
+
     plusop = pp.oneOf("+ -")
+    sgnop = pp.oneOf("+ -")
     multop = pp.oneOf("* /")
     expop = pp.Literal("^")
 
-    # Oklepaji
-    levi_oklepaj, desni_oklepaj = map(pp.Suppress, "()")
+    levi_oklepaj = pp.Suppress(pp.Literal("(") | pp.Literal("{"))
+    desni_oklepaj = pp.Suppress(pp.Literal(")") | pp.Literal("}"))
 
-    # Izraz je definiran rekurzivno, zato potrebujemo Forward()
     izraz = pp.Forward()
 
-    klic_funkcije = pp.Word(pp.alphas, pp.alphanums) + levi_oklepaj + pp.Group(izraz) + desni_oklepaj
-    operand = (
-        pp.ZeroOrMore(plusop)   # unarni +/-
-        + pp.Group(
-            klic_funkcije | spremenljivka | stevilka | pp.Group(levi_oklepaj + izraz + desni_oklepaj)
-        )
+    klic_funkcije = pp.Word(pp.alphas) + levi_oklepaj + izraz + desni_oklepaj
+    operand = klic_funkcije | stevilka | spremenljivka
+
+    izraz <<= pp.infixNotation(
+        operand,
+        [
+            (expop, 2, pp.opAssoc.RIGHT),
+            (sgnop, 1, pp.opAssoc.RIGHT),
+            (multop, 2, pp.opAssoc.LEFT),
+            (plusop, 2, pp.opAssoc.LEFT),
+        ]
     )
-
-    # Sloje ustvarimo po precedenci; najglobje v drevesu bodo eksponenti, potem produkti in potem vsote
-    # (produkt vklučuje * in /, vsota pa + in -)
-    eksponent = pp.Group(operand) + pp.ZeroOrMore(expop + pp.Group(operand))
-    produkt = pp.Group(eksponent) + pp.ZeroOrMore(multop + pp.Group(eksponent))
-    vsota = pp.Group(produkt) + pp.ZeroOrMore(plusop + pp.Group(produkt))
-
-    izraz <<= vsota
-
-    # TODO: Ugotovi, kako parsati `7x` oziroma `7 x` kot produkt
 
     return izraz
 
@@ -122,36 +156,34 @@ def evaluiraj_izraz(izraz: list, x: float):
         """Rekurzivno evaluiraj izraz"""
 
         if not isinstance(izraz, list):
-
             if isinstance(izraz, str):
                 return kontekst.get(izraz, 0)
 
             # Če je vse po sreči, je izraz sedaj float ali int
             return izraz
 
-        if len(izraz) == 1:
-            # To se načeloma nebi smelo zgoditi
-            return rekurzivna_evalvacija(izraz[0], kontekst)
-
-        elif isinstance(izraz[0], str) and (izraz[0] in FUNKCIJE or izraz[0] in "+-"):
-
-            if izraz[0] in FUNKCIJE:
-                argumenti = [rekurzivna_evalvacija(podizraz, kontekst) for podizraz in izraz[1:]]
-                return FUNKCIJE[izraz[0]](*argumenti)
-
-            elif izraz[0] in "+-":
-                # unarna operacija
-                return {"+": 1, "-": -1}[izraz[0]] * rekurzivna_evalvacija(izraz[1], kontekst)
-
-        elif len(izraz) == 3:
-            # binarna operacija
-            levi = rekurzivna_evalvacija(izraz[0], kontekst)
-            desni = rekurzivna_evalvacija(izraz[2], kontekst)
-            operacija = izraz[1]
-            return OPERACIJE.get(operacija, lambda a, b: 0)(levi, desni)
-
+        # Ena ali več levo asociranih binarnih operacij, ali klic funkcije
+        leva_vrednost = izraz[0]
+        if isinstance(leva_vrednost, str) and leva_vrednost in FUNKCIJE:
+            leva_vrednost = FUNKCIJE[leva_vrednost](rekurzivna_evalvacija(izraz[1], kontekst))
+            indeks = 2
         else:
-            raise ValueError(f"Nepričakovan izraz: {izraz}")
+            indeks = 1
+            leva_vrednost = rekurzivna_evalvacija(leva_vrednost, kontekst)
+
+        while indeks < len(izraz):
+            operator = izraz[indeks]
+            desna_vrednost = izraz[indeks+1]
+            indeks += 2
+            if isinstance(desna_vrednost, str) and desna_vrednost in FUNKCIJE:
+                desna_vrednost = FUNKCIJE[desna_vrednost](rekurzivna_evalvacija(izraz[indeks], kontekst))
+                indeks += 1
+            else:
+                desna_vrednost = rekurzivna_evalvacija(desna_vrednost, kontekst)
+
+            leva_vrednost = OPERACIJE.get(operator, lambda a, b: 0)(leva_vrednost, desna_vrednost)
+
+        return leva_vrednost
 
     kontekst = dict(KONSTANTE)
     kontekst["x"] = x
