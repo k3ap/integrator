@@ -509,6 +509,32 @@ class Integrator(ShranljivObjekt):
                     yield oddaja, uporabnik
 
 
+def graf_naloge_in_odvoda_oddaje(naloga: Naloga, oddaja: Oddaja, ime_datoteke: str):
+    """Nariši graf v nalogi podane funkcije in odvoda oddane funkcije v istem koordinatnem sistemu."""
+    xs = []
+    ys1 = []
+    ys2 = []
+
+    for x in funkcije.linspace(naloga.odvedena_funkcija.obmocje[0], naloga.odvedena_funkcija.obmocje[1]):
+        try:
+            y1 = naloga.odvedena_funkcija.evaluiraj(x)
+        except (ZeroDivisionError, OverflowError):
+            y1 = math.inf
+
+        try:
+            y2 = oddaja.funkcija.izracunaj_odvod(x)
+        except (ZeroDivisionError, OverflowError):
+            y2 = math.inf
+
+        xs.append(x)
+        ys1.append(y1)
+        ys2.append(y2)
+
+    funkcije.narisi_dvojni_graf_iz_tock(
+        xs, ys1, ys2, "Podana funkcija", "Odvod oddane funkcije", ime_datoteke
+    )
+
+
 if __name__ == "__main__":
     primer = Integrator.ustvari_iz_datoteke("primer.json")
     primer.uporabniki.append(Uporabnik.ustvari_uporabnika("janez", "novak"))

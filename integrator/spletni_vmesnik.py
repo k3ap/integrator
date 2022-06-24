@@ -149,6 +149,7 @@ def pregled_oddaje(id_oddaje):
         "rezultat_oddaje.html",
         funkcija=oddaja.funkcija,
         rezultat=oddaja.rezultat,
+        oddaja=oddaja,
         naloga=integrator.poisci_nalogo(_id=oddaja.naloga),
         meja_za_nadaljevanje=MEJA_ZA_NADALJEVANJE,
         gumb_za_nadaljevanje=gumb_za_nadaljevanje,
@@ -267,6 +268,24 @@ def graf_odvoda(id_funkcije):
         funkcija.narisi_odvod(f"grafi/{id_funkcije}_odvod.png")
 
     return bottle.static_file(f"{id_funkcije}_odvod.png", "grafi")
+
+
+@bottle.route("/graf/<id_oddaje>/oddaja/")
+def graf_oddaja(id_oddaje):
+    """Vrne narisan graf odvoda oddane funkcije in v nalogi dane funkcije."""
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
+    oddaja = uporabnik.poisci_oddajo(id_oddaje)
+    if oddaja is None:
+        bottle.abort(404, "Ni oddaje s takim ID.")
+
+    if not os.path.exists(f"grafi/{id_oddaje}_oddaja.png"):
+        model.graf_naloge_in_odvoda_oddaje(
+            integrator.poisci_nalogo(_id=oddaja.naloga),
+            oddaja,
+            f"grafi/{id_oddaje}_oddaja.png"
+        )
+
+    return bottle.static_file(f"{id_oddaje}_oddaja.png", "grafi")
 
 
 @bottle.get("/naloga/<zaporedna_stevilka:int>/")

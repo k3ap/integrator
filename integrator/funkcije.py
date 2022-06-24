@@ -198,6 +198,22 @@ def narisi_graf(izraz, obmocje, ime_datoteke):
     narisi_graf_iz_tock(xs, ys, ime_datoteke)
 
 
+def narisi_dvojni_graf_iz_tock(x_tocke, y1_tocke, y2_tocke, naslov1, naslov2, ime_datoteke):
+    """Nariši grafa dveh funkcij, združena na enem koordinatnem sistemu."""
+    fig = plt.figure()
+    axes = fig.add_subplot()
+    axes.plot(x_tocke, y1_tocke, label=naslov1)
+    axes.plot(x_tocke, y2_tocke, label=naslov2)
+    axes.legend()
+
+    spodnja, zgornja = axes.get_ybound()
+    if zgornja - spodnja < 1:
+        sredina = (zgornja + spodnja) / 2
+        axes.set_ybound(sredina - 0.5, sredina + 0.5)
+
+    fig.savefig(ime_datoteke)
+
+
 def izracunaj_odvod(izraz, tocka):
     """Izračunaj numerični približek odvoda izraza v dani točki."""
     EPS = 1e-6 * max(abs(tocka), 1)
