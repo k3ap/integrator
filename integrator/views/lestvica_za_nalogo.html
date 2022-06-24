@@ -1,0 +1,20 @@
+% rebase('base.html', podnaslov='Lestvica za nalogo ' + naloga.zaporedna_stevilka)
+
+<table class="highlight">
+    <thead>
+        <tr>
+            <th>Uporabnik</th>
+            <th>Rezultat</th>
+            <th>Čas oddaje</th>
+        </tr>
+    </thead>
+    <tbody>
+        % for rezultat, uporabnisko_ime, cas in oddaje:
+            <tr>
+                <td>{{ uporabnisko_ime }}</td>
+                <td>{{ rezultat }}</td>
+                <td>{{ cas }}</td>
+            </tr>
+        % end
+    </tbody>
+</table>

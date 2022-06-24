@@ -265,6 +265,9 @@ class Naloga(ShranljivObjekt):
     def __str__(self):
         return f"Naloga {self.zaporedna_stevilka} ({self.ime_templata})"
 
+    def __lt__(self, o):
+        return self.zaporedna_stevilka < o.zaporedna_stevilka
+
     def oceni_oddajo(self, oddana_funkcija: Funkcija):
         """Oceni oddano funkcijo in vrni številsko vrednost pridobljenih točk."""
 
@@ -498,6 +501,13 @@ class Integrator(ShranljivObjekt):
         tocke = naloga.oceni_oddajo(funkcija)
         oddaja = uporabnik.ustvari_oddajo(naloga._id, funkcija, datetime.now(), tocke)
         return oddaja
+
+    def poisci_oddaje_za_nalogo(self, id_naloge):
+        """Poišči vse oddaje, ki pripadajo nalogi. Vrne pare (oddaja, uporabnik)"""
+        for uporabnik in self.uporabniki:
+            for oddaja in uporabnik.oddaje:
+                if oddaja.naloga == id_naloge:
+                    yield oddaja, uporabnik
 
 
 if __name__ == "__main__":

@@ -51,11 +51,59 @@ def napaka(besedilo):
     return bottle.template("napaka.html", napaka=besedilo)
 
 
+def tabela_nalog(transformacija=None):
+    """Pridobi tabelo standardne širine, v kateri so razporejene vse naloge. Če je trnasformacija podana, v tabelo
+    shrani transformacija(naloga) namesto naloge."""
+
+    naloge = list(integrator.naloge)
+    naloge.sort()
+
+    vrstice = []
+    vrstica = []
+    for naloga in naloge:
+        if transformacija is None:
+            vrstica.append(naloga)
+        else:
+            vrstica.append(transformacija(naloga))
+
+        if len(vrstica) == 5:
+            vrstice.append(vrstica)
+            vrstica = []
+
+    if vrstica:
+        vrstice.append(vrstica)
+
+    return vrstice
+
+
 @bottle.route("/uvodna-stran/")
 def uvodna_stran():
     if poisci_trenutnega_uporabnika() is not None:
         bottle.redirect("/")
     return bottle.template("uvodna-stran.html")
+
+
+@bottle.route("/lestvica/")
+def lestvica_glavna_stran():
+    tabela = tabela_nalog()
+    return bottle.template("lestvica.html", tabela=tabela)
+
+
+@bottle.route("/lestvica/<zaporedna_stevilka:int>/")
+def lestvica_pregled_naloge(zaporedna_stevilka):
+    naloga = integrator.poisci_nalogo(zaporedna_stevilka)
+    if naloga is None:
+        bottle.abort(404, "Ni take naloge")
+
+    vse_oddaje = integrator.poisci_oddaje_za_nalogo(naloga._id)
+
+    oddaje = sorted(
+        ((oddaja.rezultat, uporabnik.uporabnisko_ime, oddaja.cas_oddaje.strftime(CASOVNI_FORMAT))
+            for oddaja, uporabnik in vse_oddaje),
+        reverse=True
+    )
+
+    return bottle.template("lestvica_za_nalogo.html", naloga=naloga, oddaje=oddaje)
 
 
 @bottle.route("/pregled-oddaj/<zaporedna_stevilka:int>/")
@@ -129,31 +177,22 @@ def index():
 
         return "rdece" if poskuseno else "sivo"
 
-    naloge = [
-        [naloga.zaporedna_stevilka, pridobi_status(naloga)]
-        for naloga in integrator.naloge
-    ]
+    def splosci(seznam):
+        """Splosci seznam seznamov za iteriranje"""
+        for podseznam in seznam:
+            for x in podseznam:
+                yield x
 
-    naloge.sort()
+    vrstice = tabela_nalog(lambda naloga: [naloga.zaporedna_stevilka, pridobi_status(naloga)])
 
-    for i, par in enumerate(naloge):
-        if par[1] == "sivo" and naloge[i-1][1] == "zeleno":
+    # Sedaj so naloge že pobarvane glede na to, ali jih je uporabnik rešil ali ne
+    # Moramo še poskrbeti, da uporabnik lahko rešuje nalogo, če je rešil prejšnje
+
+    prejsnji = "zeleno"
+    for i, par in enumerate(splosci(vrstice)):
+        if par[1] == "sivo" and prejsnji == "zeleno":
             par[1] = "modro"
-
-    # To se zgodi, ko uporabnik ni rešil še nobene naloge
-    if naloge[0][1] == "sivo":
-        naloge[0][1] = "modro"
-
-    vrstice = []
-    vrstica = []
-    for par in naloge:
-        vrstica.append(par)
-        if len(vrstica) == 5:
-            vrstice.append(vrstica)
-            vrstica = []
-
-    if vrstica:
-        vrstice.append(vrstica)
+        prejsnji = par[1]
 
     return bottle.template("index.html", uporabnik=uporabnik, vrstice=vrstice)
 

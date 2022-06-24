@@ -8,10 +8,10 @@
 ** TODO Grafi funkcij naj bodo lepo označeni
 ** TODO Pomanjšaj grafe
 ** TODO Povezave med raznimi stranmi
+** TODO Gumbi na indeksu naj bodo večji
 
 * TODO Dodaj uvodno besedilo
 * TODO Obrazec za spremembo gesla
 * TODO todoji v kodi
-* TODO Populiraj primer
 * TODO Pokomentiraj kodo
 * TODO Odstrani janeza iz primera
