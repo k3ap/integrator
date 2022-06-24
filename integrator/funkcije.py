@@ -1,3 +1,5 @@
+import random
+
 import pyparsing as pp
 import math
 import matplotlib.pyplot as plt
@@ -20,17 +22,12 @@ FUNKCIJE = {
     "ceil": math.ceil,
     "cos": math.cos,
     "cosh": math.cosh,
-    "erf": math.erf,
-    "erfc": math.erfc,
     "exp": math.exp,
-    "expm1": math.expm1,
     "floor": math.floor,
     "gamma": math.gamma,
-    "lgamma": math.lgamma,
     "log": math.log,
     "ln": math.log,
     "log10": math.log10,
-    "log1p": math.log1p,
     "log2": math.log2,
     "sin": math.sin,
     "sinh": math.sinh,
@@ -106,7 +103,7 @@ def pridobi_parser():
 
     izraz = pp.Forward()
 
-    klic_funkcije = pp.Word(pp.alphas) + levi_oklepaj + izraz + desni_oklepaj
+    klic_funkcije = pp.Word(pp.alphas) + levi_oklepaj + pp.Group(izraz) + desni_oklepaj
     operand = klic_funkcije | stevilka | spremenljivka
 
     izraz <<= pp.infixNotation(
@@ -192,6 +189,9 @@ def evaluiraj_izraz(izraz: list, x: float):
         return rekurzivna_evalvacija(izraz, kontekst)
     except (OverflowError, ZeroDivisionError):
         return math.inf
+    except ValueError:
+        # Najverjetneje domain error; v takem primeru vse funkcije razširimo na R
+        return 0
 
 
 def narisi_graf_iz_tock(x_tocke, y_tocke, ime_datoteke):
@@ -255,6 +255,26 @@ def izracunaj_odvod(izraz, tocka):
     levo = evaluiraj_izraz(izraz, tocka-EPS)
 
     return (desno - levo) / 2 / EPS
+
+
+def generiraj_funkcijo(globina):
+    """Rekurzivno generiraj naključno funkcijo. Vrni niz."""
+
+    if globina == 1:
+        return random.choice((
+            "x",
+            random.choice(tuple("123456789e") + ("pi",))
+        ))
+
+    else:
+        if random.randint(0, 1) == 0:
+            # izbrana je funkcija
+            funkcija = random.choice(list(FUNKCIJE))
+            return funkcija + "(" + generiraj_funkcijo(globina-1) + ")"
+        else:
+            # izbran je operator
+            op = random.choice("+-*/^")
+            return generiraj_funkcijo(globina-1) + " " + op + " " + generiraj_funkcijo(globina-1)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 * TODO Naloge
 ** TODO Dodaj naloge
-** TODO Avtomatsko generiranje
 
 * TODO Izgled
 ** TODO Povezave med raznimi stranmi

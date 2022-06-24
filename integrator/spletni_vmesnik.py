@@ -295,13 +295,17 @@ def stran_z_nalogo(zaporedna_stevilka, napaka=""):
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
 
     if zaporedna_stevilka > 1 and \
-            not uporabnik.je_resil_nalogo(integrator.poisci_nalogo(zaporedna_stevilka-1)._id, MEJA_ZA_NADALJEVANJE):
+            (prejsnja_naloga := integrator.poisci_nalogo(zaporedna_stevilka-1)) is not None and \
+            not uporabnik.je_resil_nalogo(prejsnja_naloga._id, MEJA_ZA_NADALJEVANJE):
 
         return stran_za_napako("Da se lotite naloge, morate rešiti vse naloge pred njo.")
 
     naloga = integrator.poisci_nalogo(zaporedna_stevilka=zaporedna_stevilka)
     if naloga is None:
-        bottle.abort(404, "Ta naloga ne obstaja")
+        # na tej točki je uporabnik že rešil vse naloge do te številke
+        # torej ustvarimo novo nalogo
+        naloga = integrator.ustvari_nakljucno_nalogo(zaporedna_stevilka)
+
     return bottle.template(
         naloga.ime_templata,
         naloga=naloga,

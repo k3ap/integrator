@@ -1,4 +1,5 @@
 import math
+import random
 import string
 from random import choice as random_choice
 import json
@@ -277,7 +278,7 @@ class Naloga(ShranljivObjekt):
         KRITERIJ = [
             (1e-5, 100),
             (1e-3, 90),
-            (1e-1, 60),
+            (1e-1, 80),
             (1e0, 30),
             (1e1, 10),
             (math.inf, 0)
@@ -514,6 +515,34 @@ class Integrator(ShranljivObjekt):
             for oddaja in uporabnik.oddaje:
                 if oddaja.naloga == id_naloge:
                     yield oddaja, uporabnik
+
+    def ustvari_nakljucno_nalogo(self, zaporedna_stevilka):
+        """Ustvari novo, naključno generirano nalogo."""
+
+        obmocje = [-5, 5]
+        niz_funkcije = funkcije.generiraj_funkcijo(random.randint(2, 8))
+        funkcija = Funkcija(niz_funkcije, obmocje)
+
+        # Poskusimo narisati graf; če nam to ne uspe (npr. če smo poskusili izračunali atanh(6)), zgeneriramo funkcijo
+        # znova
+
+        funkcija_deluje = False
+        while not funkcija_deluje:
+            try:
+                funkcija.narisi_graf(f"grafi/{funkcija._id}.png")
+            except ValueError:  # math domain error
+                niz_funkcije = funkcije.generiraj_funkcijo(random.randint(2, 8))
+                funkcija = Funkcija(niz_funkcije, obmocje)
+            else:
+                funkcija_deluje = True
+
+        self.naloge.append(Naloga(
+            "splosna_naloga.html",
+            funkcija,
+            str(zaporedna_stevilka),
+            [(x, 1) for x in funkcije.linspace(*obmocje, 20)]
+        ))
+        return self.naloge[-1]
 
 
 def graf_naloge_in_odvoda_oddaje(naloga: Naloga, oddaja: Oddaja, ime_datoteke: str):
