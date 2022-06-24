@@ -166,6 +166,16 @@ def narisi_graf_iz_tock(x_tocke, y_tocke, ime_datoteke):
     fig = plt.figure()
     axes = fig.add_subplot()
     axes.plot(x_tocke, y_tocke)
+
+    # Funkcije s konstantnim odvodom izgledajo sila neprijetno, ker matplotlib toliko poveča polje,
+    # da lepo vidimo celoten graf; četudi je potem skala na velikosti 1e-10
+    # Da to popravimo, na roke povečamo razpon y osi toliko, da je velik vsaj 1
+
+    spodnja, zgornja = axes.get_ybound()
+    if zgornja - spodnja < 1:
+        sredina = (zgornja + spodnja) / 2
+        axes.set_ybound(sredina - 0.5, sredina + 0.5)
+
     fig.savefig(ime_datoteke)
 
 
