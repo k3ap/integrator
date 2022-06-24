@@ -89,8 +89,6 @@ OPERACIJE = {
 
 #     izraz <<= vsota
 
-#     # TODO: Ugotovi, kako parsati `7x` oziroma `7 x` kot produkt
-
 #     return izraz
 
 
@@ -145,8 +143,6 @@ def ustvari_izraz(niz: str, parser):
 
 def evaluiraj_izraz(izraz: list, x: float):
     """Evaluiraj izraz, predstavljen s seznamom, pri vrednosti x"""
-
-    # TODO: Ta funkcija mora biti časovno omejena
 
     def rekurzivna_evalvacija(izraz, kontekst):
         """Rekurzivno evaluiraj izraz"""

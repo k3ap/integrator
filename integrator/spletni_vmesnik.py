@@ -321,7 +321,6 @@ def oddaja_naloge(zaporedna_stevilka):
     oddaja = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
 
     if oddaja is None:
-        # TODO: lepa spletna stran, ki razloži, da imaš napačno sintakso
         bottle.abort(400, "Napaka v funkciji")
 
     return pregled_oddaje(oddaja._id)

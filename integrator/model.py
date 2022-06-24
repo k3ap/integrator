@@ -454,8 +454,6 @@ class Integrator(ShranljivObjekt):
     def poisci_funkcijo(self, id_funkcije):
         """Poišči in vrni funkcijo z danim ID-jem. Če ne obstaja, vrni None."""
 
-        # TODO Polepšaj
-
         # Imamo dve možni lokaciji funkcij; kot del naloge ali kot oddaja
         # Prvo pogledamo naloge
         for naloga in self.naloge:
