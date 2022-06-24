@@ -22,7 +22,7 @@ def predelaj_niz_za_latex(niz):
         ("arcsin", "\\arcsin{(", "})"),
         ("atan", "\\arctan{(", "})"),
         ("arctan", "\\arctan{(", "})"),
-        ("cos", "\\cos{(...)}{(", "})"),
+        ("cos", "\\cos{(", "})"),
         ("cosh", "\\cosh{(", "})"),
         ("exp", "\\exp{(", "})"),
         ("log", "\\log{(", "})"),
@@ -186,7 +186,6 @@ class Funkcija(ShranljivObjekt):
     def niz_latex(self):
         """Vrni niz funkcije, polepšan za LaTeX izpis."""
         return predelaj_niz_za_latex(self.niz)
-
 
     @classmethod
     def _pridobi_parser(cls):

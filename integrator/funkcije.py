@@ -76,7 +76,7 @@ def pridobi_parser():
     klic_funkcije = pp.Word(pp.alphas, pp.alphanums) + levi_oklepaj + pp.Group(izraz) + desni_oklepaj
     operand = (
         pp.ZeroOrMore(plusop)   # unarni +/-
-        + (
+        + pp.Group(
             klic_funkcije | spremenljivka | stevilka | pp.Group(levi_oklepaj + izraz + desni_oklepaj)
         )
     )
