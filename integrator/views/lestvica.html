@@ -1,17 +1,26 @@
 % rebase('base.html', naslov='Lestvica', podnaslov='Lestvica: izberi nalogo')
 
-<table>
-    <tbody>
-        % for vrstica in tabela:
-            <tr>
-                % for naloga in vrstica:
-                    <td class="center-align">
-                        <a href="/lestvica/{{ naloga.zaporedna_stevilka }}/" class="btn-flat flow-text">
-                            {{ naloga.zaporedna_stevilka }}
-                        </a>
-                    </td>
-                % end
-            </tr>
-        % end
-    </tbody>
-</table>
+<div class="row center-align">
+    <a href="/" class="btn waves-effect brown">
+        Nazaj na glavno stran
+        <i class="material-icons left">arrow_back</i>
+    </a>
+</div>
+
+<div class="row">
+    <table>
+        <tbody>
+            % for vrstica in tabela:
+                <tr>
+                    % for naloga in vrstica:
+                        <td class="center-align">
+                            <a href="/lestvica/{{ naloga.zaporedna_stevilka }}/" class="btn-flat flow-text">
+                                {{ naloga.zaporedna_stevilka }}
+                            </a>
+                        </td>
+                    % end
+                </tr>
+            % end
+        </tbody>
+    </table>
+</div>

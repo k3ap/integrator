@@ -41,7 +41,11 @@
                         Trenutno prijavljeni kot <i>{{ uporabnik.uporabnisko_ime }}</i>.
                     </div>
                     <div class="card-action">
-                        <a href="/">Glavna stran</a>
+                        % if defined('prikazi_lestvico') and prikazi_lestvico:
+                            <a href="/lestvica/">Lestvica</a>
+                        % else:
+                            <a href="/">Glavna stran</a>
+                        % end
                         <a href="/sprememba-gesla/">Spremeni geslo</a>
                         <a href="/odjava/">Odjava</a>
                     </div>

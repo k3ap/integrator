@@ -1,38 +1,41 @@
-% rebase('base.html')
+% rebase('base.html', podnaslov='Pregled nalog', prikazi_lestvico=True)
 
-<table>
-    <tbody>
-        % for vrstica in vrstice:
-            <tr>
-                % for naloga, status in vrstica:
-                    % if status == "zeleno":
-                        <td class="green lighten-1 center-align">
-                            <a href="/naloga/{{ naloga }}/" class="green-text text-darken-3 btn-flat">        
-                                {{ naloga }}
-                            </a>
-                        </td>
-                        
-                    % elif status == "rdece":
-                        <td class="red center-align">
-                            <a href="/naloga/{{ naloga }}/" class="red-text text-darken-3 btn-flat">
-                                {{ naloga }}
-                            </a>
-                        </td>
-                    % elif status == "modro":
-                        <td class="blue-grey lighten-5 center-align">
-                            <a href="/naloga/{{ naloga }}/" class="blue-text btn-flat">
-                                {{ naloga }}
-                            </a>
-                        </td>
-                    % else:
-                        <td class="grey lighten-1 white-text center-align">
-                            <a class="btn-flat disabled">
-                                {{ naloga }}
-                            </a>
-                        </td>
+
+<div class="row">
+    <table>
+        <tbody>
+            % for vrstica in vrstice:
+                <tr>
+                    % for naloga, status in vrstica:
+                        % if status == "zeleno":
+                            <td class="green lighten-1 center-align">
+                                <a href="/naloga/{{ naloga }}/" class="green-text text-darken-3 btn-flat">        
+                                    {{ naloga }}
+                                </a>
+                            </td>
+                            
+                        % elif status == "rdece":
+                            <td class="red center-align">
+                                <a href="/naloga/{{ naloga }}/" class="red-text text-darken-3 btn-flat">
+                                    {{ naloga }}
+                                </a>
+                            </td>
+                        % elif status == "modro":
+                            <td class="blue-grey lighten-5 center-align">
+                                <a href="/naloga/{{ naloga }}/" class="blue-text btn-flat">
+                                    {{ naloga }}
+                                </a>
+                            </td>
+                        % else:
+                            <td class="grey lighten-1 white-text center-align">
+                                <a class="btn-flat disabled">
+                                    {{ naloga }}
+                                </a>
+                            </td>
+                        % end
                     % end
-                % end
-            </tr>
-        % end
-    </tbody>
-</table>
+                </tr>
+            % end
+        </tbody>
+    </table>
+</div>

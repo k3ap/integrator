@@ -1,6 +1,4 @@
 * TODO Izgled
-** TODO Povezave med raznimi stranmi
 ** TODO Gumbi na indeksu naj bodo večji
 
 * TODO Pokomentiraj kodo
-* TODO Lestvica na indeks

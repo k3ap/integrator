@@ -1,20 +1,33 @@
 % rebase('base.html', podnaslov='Lestvica za nalogo ' + naloga.zaporedna_stevilka)
 
-<table class="highlight">
-    <thead>
-        <tr>
-            <th>Uporabnik</th>
-            <th>Rezultat</th>
-            <th>Čas oddaje</th>
-        </tr>
-    </thead>
-    <tbody>
-        % for rezultat, uporabnisko_ime, cas in oddaje:
+<div class="row center-align">
+    <a href="/lestvica/" class="btn waves-effect brown">
+        Ostale naloge
+        <i class="material-icons left">arrow_back</i>
+    </a>
+    <a href="/naloga/{{ naloga.zaporedna_stevilka }}/" class="btn waves-effect brown">
+        Ogled naloge
+        <i class="material-icons left">article</i>
+    </a>
+</div>
+
+<div class="row">
+    <table class="highlight">
+        <thead>
             <tr>
-                <td>{{ uporabnisko_ime }}</td>
-                <td>{{ rezultat }}</td>
-                <td>{{ cas }}</td>
+                <th>Uporabnik</th>
+                <th>Rezultat</th>
+                <th>Čas oddaje</th>
             </tr>
-        % end
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            % for rezultat, uporabnisko_ime, cas in oddaje:
+                <tr>
+                    <td>{{ uporabnisko_ime }}</td>
+                    <td>{{ rezultat }}</td>
+                    <td>{{ cas }}</td>
+                </tr>
+            % end
+        </tbody>
+    </table>
+</div>

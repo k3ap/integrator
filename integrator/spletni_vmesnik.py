@@ -85,12 +85,15 @@ def uvodna_stran():
 
 @bottle.route("/lestvica/")
 def lestvica_glavna_stran():
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
     tabela = tabela_nalog()
-    return bottle.template("lestvica.html", tabela=tabela)
+    return bottle.template("lestvica.html", tabela=tabela, uporabnik=uporabnik)
 
 
 @bottle.route("/lestvica/<zaporedna_stevilka:int>/")
 def lestvica_pregled_naloge(zaporedna_stevilka):
+    uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
+
     naloga = integrator.poisci_nalogo(zaporedna_stevilka)
     if naloga is None:
         bottle.abort(404, "Ni take naloge")
@@ -103,7 +106,7 @@ def lestvica_pregled_naloge(zaporedna_stevilka):
         reverse=True
     )
 
-    return bottle.template("lestvica_za_nalogo.html", naloga=naloga, oddaje=oddaje)
+    return bottle.template("lestvica_za_nalogo.html", naloga=naloga, oddaje=oddaje, uporabnik=uporabnik)
 
 
 @bottle.route("/pregled-oddaj/<zaporedna_stevilka:int>/")
