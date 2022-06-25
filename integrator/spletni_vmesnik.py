@@ -162,6 +162,12 @@ def index():
     """Glavna stran. Prikaže tabelo rešenih nalog."""
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
 
+    # Če je uporabnik že rešil vse naloge, moramo ustvariti novo, da bo imel kam klikniti
+    # Za to potrebujemo pogledati le rešitev zadnje naloge
+    zadnja_naloga = max(naloga for naloga in integrator.naloge)
+    if uporabnik.je_resil_nalogo(zadnja_naloga._id, MEJA_ZA_NADALJEVANJE):
+        integrator.ustvari_nakljucno_nalogo(int(zadnja_naloga.zaporedna_stevilka)+1)
+
     # Ustvari seznam parov [naloga, status], kjer je status odvisen od rešitev:
     # če je uporabnik nalogo rešil, je status "zeleno"
     # če je uporabnik nalgoo poskusil, a neuspešno, je status "rdeče"

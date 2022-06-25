@@ -53,40 +53,7 @@ OPERACIJE = {
 }
 
 
-# def pridobi_parser():
-#     """Ustvari in vrni razčlenjevalnik za procesiranje matematičnih izrazov."""
-
-#     # Atomi
-#     stevilka = pp.pyparsing_common.number
-#     spremenljivka = pp.Word(pp.alphas)
-#     # Operacije
-#     plusop = pp.oneOf("+ -")
-#     multop = pp.oneOf("* /")
-#     expop = pp.Literal("^")
-
-#     # Oklepaji
-#     levi_oklepaj, desni_oklepaj = map(pp.Suppress, "()")
-
-#     # Izraz je definiran rekurzivno, zato potrebujemo Forward()
-#     izraz = pp.Forward()
-
-#     klic_funkcije = pp.Word(pp.alphas, pp.alphanums) + levi_oklepaj + pp.Group(izraz) + desni_oklepaj
-#     operand = (
-#         pp.ZeroOrMore(plusop)   # unarni +/-
-#         + pp.Group(
-#             klic_funkcije | spremenljivka | stevilka | pp.Group(levi_oklepaj + izraz + desni_oklepaj)
-#         )
-#     )
-
-#     # Sloje ustvarimo po precedenci; najglobje v drevesu bodo eksponenti, potem produkti in potem vsote
-#     # (produkt vklučuje * in /, vsota pa + in -)
-#     eksponent = pp.Group(operand) + pp.ZeroOrMore(expop + pp.Group(operand))
-#     produkt = pp.Group(eksponent) + pp.ZeroOrMore(multop + pp.Group(eksponent))
-#     vsota = pp.Group(produkt) + pp.ZeroOrMore(plusop + pp.Group(produkt))
-
-#     izraz <<= vsota
-
-#     return izraz
+MINIMALNA_VELIKOST_GRAFA = 0.05
 
 
 def pridobi_parser():
@@ -205,9 +172,9 @@ def narisi_graf_iz_tock(x_tocke, y_tocke, ime_datoteke):
     # Da to popravimo, na roke povečamo razpon y osi toliko, da je velik vsaj 1
 
     spodnja, zgornja = axes.get_ybound()
-    if zgornja - spodnja < 1:
+    if zgornja - spodnja < MINIMALNA_VELIKOST_GRAFA:
         sredina = (zgornja + spodnja) / 2
-        axes.set_ybound(sredina - 0.5, sredina + 0.5)
+        axes.set_ybound(sredina - 0.5 * MINIMALNA_VELIKOST_GRAFA, sredina + 0.5 * MINIMALNA_VELIKOST_GRAFA)
 
     fig.savefig(ime_datoteke)
 
@@ -240,9 +207,9 @@ def narisi_dvojni_graf_iz_tock(x_tocke, y1_tocke, y2_tocke, naslov1, naslov2, im
     axes.legend()
 
     spodnja, zgornja = axes.get_ybound()
-    if zgornja - spodnja < 1:
+    if zgornja - spodnja < MINIMALNA_VELIKOST_GRAFA:
         sredina = (zgornja + spodnja) / 2
-        axes.set_ybound(sredina - 0.5, sredina + 0.5)
+        axes.set_ybound(sredina - 0.5 * MINIMALNA_VELIKOST_GRAFA, sredina + 0.5 * MINIMALNA_VELIKOST_GRAFA)
 
     fig.savefig(ime_datoteke)
 

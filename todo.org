@@ -1,10 +1,6 @@
-* TODO Naloge
-** TODO Dodaj naloge
-
 * TODO Izgled
 ** TODO Povezave med raznimi stranmi
 ** TODO Gumbi na indeksu naj bodo večji
 
 * TODO Pokomentiraj kodo
-* TODO Odstrani janeza iz primera
-* TODO Časovno omeji evaluiraj_izraz
+* TODO Bolje razloži, katere operacije in funkcije lahko uporabijo

@@ -519,7 +519,7 @@ class Integrator(ShranljivObjekt):
     def ustvari_nakljucno_nalogo(self, zaporedna_stevilka):
         """Ustvari novo, naključno generirano nalogo."""
 
-        obmocje = [-5, 5]
+        obmocje = [-1, 1]
         niz_funkcije = funkcije.generiraj_funkcijo(random.randint(2, 8))
         funkcija = Funkcija(niz_funkcije, obmocje)
 
