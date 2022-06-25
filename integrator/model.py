@@ -503,7 +503,7 @@ class Integrator(ShranljivObjekt):
         try:
             funkcija = Funkcija(funkcijski_niz, naloga.odvedena_funkcija.obmocje)
             tocke = naloga.oceni_oddajo(funkcija)
-        except pyparsing.ParseException:
+        except Exception:
             return None
 
         oddaja = uporabnik.ustvari_oddajo(naloga._id, funkcija, datetime.now(), tocke)

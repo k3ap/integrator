@@ -3,4 +3,4 @@
 ** TODO Gumbi na indeksu naj bodo večji
 
 * TODO Pokomentiraj kodo
-* TODO Bolje razloži, katere operacije in funkcije lahko uporabijo
+* TODO Lestvica na indeks

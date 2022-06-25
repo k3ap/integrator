@@ -332,7 +332,10 @@ def oddaja_naloge(zaporedna_stevilka):
     oddaja = integrator.dodaj_oddajo(zaporedna_stevilka, uporabnik, funkcijski_niz)
 
     if oddaja is None:
-        return stran_z_nalogo(zaporedna_stevilka, napaka="Napaka pri branju funkcije; neveljavna sintaksa.")
+        return stran_z_nalogo(
+            zaporedna_stevilka,
+            napaka="Napaka pri branju funkcije. Vzrok temu je lahko neveljavna sintaksa, neznana funkcija ipd."
+        )
 
     return pregled_oddaje(oddaja._id)
 
