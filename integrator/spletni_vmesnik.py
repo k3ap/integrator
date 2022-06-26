@@ -11,7 +11,6 @@ MEJA_ZA_NADALJEVANJE = 80   # meja, po kateri so funkcije 'pravilne' in program 
 CASOVNI_FORMAT = "%H:%M %-d. %-m. %Y"
 
 # Preberi podatke iz baze
-
 if not os.path.exists(DATOTEKA_Z_BAZO_PODATKOV):
     # Prekopiramo primer
     shutil.copy("primer.json", DATOTEKA_Z_BAZO_PODATKOV)
@@ -51,22 +50,22 @@ def stran_za_napako(besedilo):
     return bottle.template("napaka.html", napaka=besedilo)
 
 
-def tabela_nalog(transformacija=None):
-    """Pridobi tabelo standardne širine, v kateri so razporejene vse naloge. Če je trnasformacija podana, v tabelo
+def tabela_nalog(transformacija=None, sirina=5):
+    """Pridobi tabelo standardne širine, v kateri so razporejene vse naloge. Če je transformacija podana, v tabelo
     shrani transformacija(naloga) namesto naloge."""
 
     naloge = list(integrator.naloge)
     naloge.sort()
 
-    vrstice = []
-    vrstica = []
+    vrstice = []  # Vse vrstice, ki smo jih do sedaj zložili
+    vrstica = []  # Trenutna vrstica
     for naloga in naloge:
         if transformacija is None:
             vrstica.append(naloga)
         else:
             vrstica.append(transformacija(naloga))
 
-        if len(vrstica) == 5:
+        if len(vrstica) == sirina:
             vrstice.append(vrstica)
             vrstica = []
 
@@ -85,6 +84,7 @@ def uvodna_stran():
 
 @bottle.route("/lestvica/")
 def lestvica_glavna_stran():
+    """Glavna stran lestvice."""
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
     tabela = tabela_nalog()
     return bottle.template("lestvica.html", tabela=tabela, uporabnik=uporabnik)
@@ -92,6 +92,7 @@ def lestvica_glavna_stran():
 
 @bottle.route("/lestvica/<zaporedna_stevilka:int>/")
 def lestvica_pregled_naloge(zaporedna_stevilka):
+    """Lestvica določene naloge."""
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
 
     naloga = integrator.poisci_nalogo(zaporedna_stevilka)
@@ -113,6 +114,7 @@ def lestvica_pregled_naloge(zaporedna_stevilka):
 def pregled_oddaj(zaporedna_stevilka):
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
 
+    # Prefiltriraj uporabnikove oddaje in prikaži le oddaje za to nalogo
     oddaje = []
     for oddaja in uporabnik.oddaje:
         naloga = integrator.poisci_nalogo(_id=oddaja.naloga).zaporedna_stevilka
@@ -137,8 +139,7 @@ def pregled_oddaj(zaporedna_stevilka):
 
 @bottle.route("/pregled-oddaje/<id_oddaje>/")
 def pregled_oddaje(id_oddaje):
-    """Pregled uspešnosti posamične oddaje. gumb_za_naprej pove, če naj ima oddaja gumb za nadaljevanje,
-    četudi je morda neuspešna"""
+    """Pregled uspešnosti posamične oddaje."""
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
     oddaja = uporabnik.poisci_oddajo(_id=id_oddaje)
     if oddaja is None:
@@ -162,7 +163,7 @@ def pregled_oddaje(id_oddaje):
 
 @bottle.route("/")
 def index():
-    """Glavna stran. Prikaže tabelo rešenih nalog."""
+    """Glavna stran. Prikaže tabelo rešenih in nerešenih nalog."""
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
 
     # Če je uporabnik že rešil vse naloge, moramo ustvariti novo, da bo imel kam klikniti
@@ -266,19 +267,6 @@ def graf(id_funkcije):
     return bottle.static_file(f"{id_funkcije}.png", "grafi")
 
 
-@bottle.route("/graf/<id_funkcije>/odvod/")
-def graf_odvoda(id_funkcije):
-    """Vrne narisan graf odvoda funkcije"""
-    funkcija = integrator.poisci_funkcijo(id_funkcije)
-    if funkcija is None:
-        bottle.abort(404, "Ni take funkcije")
-
-    if not os.path.exists(f"grafi/{id_funkcije}_odvod.png"):
-        funkcija.narisi_odvod(f"grafi/{id_funkcije}_odvod.png")
-
-    return bottle.static_file(f"{id_funkcije}_odvod.png", "grafi")
-
-
 @bottle.route("/graf/<id_oddaje>/oddaja/")
 def graf_oddaja(id_oddaje):
     """Vrne narisan graf odvoda oddane funkcije in v nalogi dane funkcije."""
@@ -345,6 +333,7 @@ def oddaja_naloge(zaporedna_stevilka):
 
 @bottle.get("/sprememba-gesla/")
 def sprememba_gesla(napaka=""):
+    """Stran za spremembo gesla."""
     uporabnik = poisci_trenutnega_uporabnika_ali_redirect()
     return bottle.template("sprememba_gesla.html", napaka=napaka, uporabnik=uporabnik)
 

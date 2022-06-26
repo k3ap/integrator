@@ -7,8 +7,6 @@ from datetime import datetime
 from hashlib import sha256
 import secrets
 
-import pyparsing
-
 import funkcije
 from pomozne_funkcije import linspace
 
@@ -16,32 +14,36 @@ from pomozne_funkcije import linspace
 def predelaj_niz_za_latex(niz):
     """Polepšaj niz, da bo bolje izgledal v latex-u"""
 
+    # Zamenjave, ki jih program opravi.
+    # (ime_funkcije, leva_zamenjava, desna_zamenjava)
+    # Izjema tu je zadnji vnos; prazno ime_funkcije pomeni, da bo zamenjal katerekoli oklepaje
+    # Dodatni oklepaji okoli vseh funkcij so tam zato, da se `... ^ (funkcija)` pravilno pokaže
     SUBSTITUCIJE = [
-        ("abs", "\\left|", "\\right|"),
-        ("acos", "\\arccos{(", "})"),
-        ("arccos", "\\arccos{(", "})"),
-        ("asin", "\\arcsin{(", "})"),
-        ("arcsin", "\\arcsin{(", "})"),
-        ("atan", "\\arctan{(", "})"),
-        ("arctan", "\\arctan{(", "})"),
-        ("cos", "\\cos{(", "})"),
-        ("cosh", "\\cosh{(", "})"),
-        ("exp", "\\exp{(", "})"),
-        ("log", "\\log{(", "})"),
-        ("ln", "\\ln{(", "})"),
-        ("sin", "\\sin{(", "})"),
-        ("sinh", "\\sinh{(", "})"),
-        ("sqrt", "\\sqrt{", "}"),
-        ("tan", "\\tan{(", "})"),
-        ("tanh", "\\tanh{(", "})"),
-        ("log10", "\\log_{10}{(", "})"),
-        ("log2", "\\log_2{(", "})"),
+        ("abs", "{\\left|", "\\right|}"),
+        ("acos", "{\\arccos{(", ")}}"),
+        ("arccos", "{\\arccos{(", ")}}"),
+        ("asin", "{\\arcsin{(", ")}}"),
+        ("arcsin", "{\\arcsin{(", ")}}"),
+        ("atan", "{\\arctan{(", ")}}"),
+        ("arctan", "{\\arctan{(", ")}}"),
+        ("cos", "{\\cos{(", ")}}"),
+        ("cosh", "{\\cosh{(", ")}}"),
+        ("exp", "{\\exp{(", ")}}"),
+        ("log", "{\\log{(", ")}}"),
+        ("ln", "{\\ln{(", ")}}"),
+        ("sin", "{\\sin{(", ")}}"),
+        ("sinh", "{\\sinh{(", ")}}"),
+        ("sqrt", "{\\sqrt{", "}}"),
+        ("tan", "{\\tan{(", ")}}"),
+        ("tanh", "{\\tanh{(", ")}}"),
+        ("log10", "{\\log_{10}{(", ")}}"),
+        ("log2", "{\\log_2{(", ")}}"),
         ("", "{(", ")}"),
     ]
 
     # Poiščemo oklepaje, in si označimo, kje se začnejo, končajo, in katera funkcija je pred njimi
-    oklepaji = []
-    pari_oklepajev = []
+    oklepaji = []  # Sklad parov (ime_funkcije, indeks_oklepaja)
+    pari_oklepajev = []  # Seznam trojic (ime_funkcije, indeks_levega, indeks_desnega)
     ime_funkcije = ""
     for i, ch in enumerate(niz):
         if ch in string.ascii_letters + string.digits:
@@ -67,6 +69,8 @@ def predelaj_niz_za_latex(niz):
             if ime_za_zamenjavo == ime:
                 break
         else:
+            # Če nismo našli prave substitucije, pustimo ime funkcije, kakršno je
+            # Primer tega je npr. funkcija floor()
             continue
 
         zamenjave.append((levi-len(ime), len(ime)+1, leva_zamenjava))
@@ -174,7 +178,7 @@ class Funkcija(ShranljivObjekt):
 
     @classmethod
     def ustvari_funkcijo(cls, podatki):
-        """Ustvari funkcijo iz neznanih podatkov; lahko je slovar, niz ali Funkcija"""
+        """Ustvari funkcijo iz neznanih podatkov; lahko je slovar ali Funkcija"""
         if isinstance(podatki, Funkcija):
             return podatki
         if isinstance(podatki, dict):
@@ -210,16 +214,6 @@ class Funkcija(ShranljivObjekt):
     def izracunaj_odvod(self, tocka):
         """Izračunaj približek odvoda v točki."""
         return funkcije.izracunaj_odvod(self.izraz, tocka)
-
-    def narisi_odvod(self, ime_datoteke):
-        """Nariši graf odvoda na območju in ga shrani v datoteko."""
-        xs = []
-        ys = []
-        for x in linspace(self.obmocje[0], self.obmocje[1]):
-            xs.append(x)
-            ys.append(self.izracunaj_odvod(x))
-
-        funkcije.narisi_graf_iz_tock(xs, ys, ime_datoteke)
 
     def evaluiraj(self, x):
         """Evaluiraj funkcijo v x."""
@@ -414,9 +408,9 @@ class Uporabnik(ShranljivObjekt):
 
     def poisci_oddajo(self, _id):
         """Poišči oddajo ali vrni None, če ne obstaja"""
-        for oddaja in self.oddaje:
-            if oddaja._id == _id:
-                return oddaja
+        objekt = Oddaja.ustvarjeni_objekti.get(_id, None)
+        if isinstance(objekt, Oddaja) and objekt in self.oddaje:
+            return objekt
         return None
 
     def je_resil_nalogo(self, naloga: str, meja: int):
@@ -461,17 +455,10 @@ class Integrator(ShranljivObjekt):
     def poisci_funkcijo(self, id_funkcije):
         """Poišči in vrni funkcijo z danim ID-jem. Če ne obstaja, vrni None."""
 
-        # Imamo dve možni lokaciji funkcij; kot del naloge ali kot oddaja
-        # Prvo pogledamo naloge
-        for naloga in self.naloge:
-            if naloga.odvedena_funkcija._id == id_funkcije:
-                return naloga.odvedena_funkcija
+        objekt = Funkcija.ustvarjeni_objekti.get(id_funkcije, None)
 
-        # Sedaj še oddaje
-        for uporabnik in self.uporabniki:
-            for oddaja in uporabnik.oddaje:
-                if oddaja.funkcija._id == id_funkcije:
-                    return oddaja.funkcija
+        if isinstance(objekt, Funkcija):
+            return objekt
 
         return None
 
@@ -485,9 +472,9 @@ class Integrator(ShranljivObjekt):
             return None
 
         if _id is not None:
-            for naloga in self.naloge:
-                if naloga._id == _id:
-                    return naloga
+            objekt = Naloga.ustvarjeni_objekti.get(_id, None)
+            if isinstance(objekt, Naloga):
+                return objekt
             return None
 
         return None
@@ -510,7 +497,7 @@ class Integrator(ShranljivObjekt):
         return oddaja
 
     def poisci_oddaje_za_nalogo(self, id_naloge):
-        """Poišči vse oddaje, ki pripadajo nalogi. Vrne pare (oddaja, uporabnik)"""
+        """Poišči vse oddaje, ki pripadajo nalogi. Vrača pare (oddaja, uporabnik)"""
         for uporabnik in self.uporabniki:
             for oddaja in uporabnik.oddaje:
                 if oddaja.naloga == id_naloge:
@@ -519,8 +506,11 @@ class Integrator(ShranljivObjekt):
     def ustvari_nakljucno_nalogo(self, zaporedna_stevilka):
         """Ustvari novo, naključno generirano nalogo."""
 
+        # Koliko je minimalna in koliko maksimalna globina funkcije
+        KOMPLEKSNOST = (2, 5)
+
         obmocje = [-1, 1]
-        niz_funkcije = funkcije.generiraj_funkcijo(random.randint(2, 8))
+        niz_funkcije = funkcije.generiraj_funkcijo(random.randint(*KOMPLEKSNOST))
         funkcija = Funkcija(niz_funkcije, obmocje)
 
         # Poskusimo narisati graf; če nam to ne uspe (npr. če smo poskusili izračunali atanh(6)), zgeneriramo funkcijo
@@ -531,7 +521,7 @@ class Integrator(ShranljivObjekt):
             try:
                 funkcija.narisi_graf(f"grafi/{funkcija._id}.png")
             except ValueError:  # math domain error
-                niz_funkcije = funkcije.generiraj_funkcijo(random.randint(2, 8))
+                niz_funkcije = funkcije.generiraj_funkcijo(random.randint(*KOMPLEKSNOST))
                 funkcija = Funkcija(niz_funkcije, obmocje)
             else:
                 funkcija_deluje = True
@@ -585,6 +575,4 @@ if __name__ == "__main__":
     ))
     primer.shrani_v_datoteko("prebavljen_primer.json")
 
-    # funkcija.narisi_graf([-5, 5], "primer.png")
-    integrirana.narisi_odvod("primer.png")
 

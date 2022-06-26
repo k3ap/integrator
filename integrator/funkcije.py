@@ -1,3 +1,5 @@
+"""Zbirka orodij za obdelovanje funkcij, vpisanih v matematičnem zapisu - parsing, evalvacija, ..."""
+
 import random
 
 import pyparsing as pp
@@ -7,7 +9,7 @@ import matplotlib.pyplot as plt
 from pomozne_funkcije import linspace
 
 
-# Poznane/dovoljene funkcije
+# Poznane/dovoljene funkcije, ki jih uporabnik lahko zapiše in uporablja
 FUNKCIJE = {
     "abs": abs,
     "acos": math.acos,
@@ -40,8 +42,8 @@ KONSTANTE = {
     "pi": math.pi,
     "tau": math.tau,
     "e": math.e,
-    "c": 0,
-    "C": 0,
+    # Če uporabnik vpiše kakšno drugo spremenljivko kot x ali zgoraj napisane konstante, bo
+    # vrednost te spremenljivke interpretirana kot 0
 }
 
 OPERACIJE = {
@@ -52,11 +54,14 @@ OPERACIJE = {
     "^": lambda a, b: math.pow(a, b)
 }
 
-
+# Minimalni razpon y osi, ki ga ima lahko graf
+# Pri aproksimaciji odvoda pride do majhnih napak; tako bi odvod konstantne funkcije
+# na narisanem grafu izgledal zelo nekonstanten, če tega ne naredimo
 MINIMALNA_VELIKOST_GRAFA = 0.05
 
 
 def pridobi_parser():
+    """Ustvari nov razčlenjevalnik za interpretacijo matematičnih izrazov."""
     stevilka = pp.pyparsing_common.number
     spremenljivka = pp.Word(pp.alphas)
 
@@ -87,7 +92,11 @@ def pridobi_parser():
 
 
 def predelaj_izraz(izraz: pp.ParseResults):
-    """Odstrani odvečne sloje v ParseResults in ga spremeni v list"""
+    """Odstrani odvečne sloje v ParseResults in ga spremeni v python list."""
+
+    # Včasih parser kombinira več pp.Group objektov, zaradi česar se v izrazu pojavi več slojev, npr.
+    # [[[ ... ]], "+", ...]
+    # To želimo odstraniti
     while isinstance(izraz, pp.ParseResults) and len(izraz) == 1:
         izraz = izraz[0]
 
@@ -105,7 +114,7 @@ def ustvari_izraz(niz: str, parser):
     return predelaj_izraz(izraz)
 
 
-def evaluiraj_izraz(izraz: list, x: float):
+def evaluiraj_izraz(ociscen_izraz: list, x: float):
     """Evaluiraj izraz, predstavljen s seznamom, pri vrednosti x"""
 
     def rekurzivna_evalvacija(izraz, kontekst):
@@ -118,15 +127,20 @@ def evaluiraj_izraz(izraz: list, x: float):
             # Če je vse po sreči, je izraz sedaj float ali int
             return izraz
 
-        # Ena ali več levo asociranih binarnih operacij, ali klic funkcije
+        # Izraz je sedaj ena ali več levo asociranih binarnih operacij, ali klic funkcije
+
+        # Unarni plus ali minus na začetku (ali tik po oklepaju) se evaluirata drugače kot drugje v izrazu,
+        # zato potrebujemo za njiju poseben test
         leva_vrednost = izraz[0]
-        indeks = 1
-        levi_unarni = 1
+        indeks = 1  # indeks naslednjega (do sedaj neuporabljenega) dela izraza
+        levi_unarni = 1  # +1 ali -1
         while isinstance(leva_vrednost, str) and leva_vrednost in "+-":
             levi_unarni *= {"+": 1, "-": -1}[leva_vrednost]
             leva_vrednost = izraz[indeks]
             indeks += 1
 
+        # Funkcije se parsajo na sledeč način:
+        # "3 + cos(x)" --> [3, "+", "cos", "x"]
         if isinstance(leva_vrednost, str) and leva_vrednost in FUNKCIJE:
             leva_vrednost = FUNKCIJE[leva_vrednost](rekurzivna_evalvacija(izraz[indeks], kontekst))
             indeks += 1
@@ -135,25 +149,32 @@ def evaluiraj_izraz(izraz: list, x: float):
 
         leva_vrednost *= levi_unarni
 
+        # Ko smo obdelali najbolj levo vrednost, eno po eno obdelamo vse operacije na tem nivoju
+        # Levo asocirane operacije z enako precedenco se parsajo na sledeč način:
+        # "3 + 2 + 5" --> [3, "+", 2, "+", 5]
         while indeks < len(izraz):
             operator = izraz[indeks]
             indeks += 1
             desna_vrednost = izraz[indeks]
             indeks += 1
+
+            # Tudi desna vrednost je lahko funkcija
             if isinstance(desna_vrednost, str) and desna_vrednost in FUNKCIJE:
                 desna_vrednost = FUNKCIJE[desna_vrednost](rekurzivna_evalvacija(izraz[indeks], kontekst))
                 indeks += 1
             else:
                 desna_vrednost = rekurzivna_evalvacija(desna_vrednost, kontekst)
 
+            # Da simuliramo levo asociranost, samo prepišemo levo vrednost za naslednjo iteracijo
             leva_vrednost = OPERACIJE.get(operator, lambda a, b: 0)(leva_vrednost, desna_vrednost)
 
         return leva_vrednost
 
+    # Kontekst je skupek vseh vrednosti spremenljivk ob nekem času.
     kontekst = dict(KONSTANTE)
     kontekst["x"] = x
     try:
-        return rekurzivna_evalvacija(izraz, kontekst)
+        return rekurzivna_evalvacija(ociscen_izraz, kontekst)
     except (OverflowError, ZeroDivisionError):
         return math.inf
     except ValueError:
@@ -169,7 +190,7 @@ def narisi_graf_iz_tock(x_tocke, y_tocke, ime_datoteke):
 
     # Funkcije s konstantnim odvodom izgledajo sila neprijetno, ker matplotlib toliko poveča polje,
     # da lepo vidimo celoten graf; četudi je potem skala na velikosti 1e-10
-    # Da to popravimo, na roke povečamo razpon y osi toliko, da je velik vsaj 1
+    # Da to popravimo, na roke povečamo razpon y osi toliko, da je velik vsaj MININALNA_VELIKOST_GRAFA
 
     spodnja, zgornja = axes.get_ybound()
     if zgornja - spodnja < MINIMALNA_VELIKOST_GRAFA:
@@ -199,13 +220,15 @@ def narisi_graf(izraz, obmocje, ime_datoteke):
 
 
 def narisi_dvojni_graf_iz_tock(x_tocke, y1_tocke, y2_tocke, naslov1, naslov2, ime_datoteke):
-    """Nariši grafa dveh funkcij, združena na enem koordinatnem sistemu."""
+    """Nariši grafa dveh funkcij, združena na enem koordinatnem sistemu. naslov1 in naslov2 označujeta imena
+    funkcij na legendi."""
     fig = plt.figure()
     axes = fig.add_subplot()
     axes.plot(x_tocke, y1_tocke, label=naslov1)
     axes.plot(x_tocke, y2_tocke, label=naslov2)
     axes.legend()
 
+    # Po potrebi popravimo y meje
     spodnja, zgornja = axes.get_ybound()
     if zgornja - spodnja < MINIMALNA_VELIKOST_GRAFA:
         sredina = (zgornja + spodnja) / 2
@@ -216,6 +239,11 @@ def narisi_dvojni_graf_iz_tock(x_tocke, y1_tocke, y2_tocke, naslov1, naslov2, im
 
 def izracunaj_odvod(izraz, tocka):
     """Izračunaj numerični približek odvoda izraza v dani točki."""
+
+    # Na visokih koordinatah je napaka računanja odvoda večja; to poskusimo rešiti tako,
+    # da povečamo razpon točk za računanje
+    # Pri mnogo funkcijah to dobro deluje, z nekaterimi izjemami; npr. sinus ali kosinus, kjer
+    # večje območje pripomore k večji napaki
     EPS = 1e-6 * max(abs(tocka), 1)
 
     desno = evaluiraj_izraz(izraz, tocka+EPS)
@@ -225,9 +253,10 @@ def izracunaj_odvod(izraz, tocka):
 
 
 def generiraj_funkcijo(globina):
-    """Rekurzivno generiraj naključno funkcijo. Vrni niz."""
+    """Rekurzivno generiraj naključno funkcijo, kjer globina označuje, koliko operacij lahko funkcija vsebuje.
+    Vrni niz."""
 
-    if globina == 1:
+    if globina <= 1:
         return random.choice((
             "x",
             random.choice(tuple("123456789e") + ("pi",))
