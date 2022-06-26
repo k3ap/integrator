@@ -3,7 +3,8 @@
 Spletna aplikacija za vajo integriranja skozi igro. Osnovna namestitev 
 vključuje 20 začetnih nalog, ki vodijo uporabnika skozi delovanje aplikacije
 ter mu ponudijo nekaj primerov, v katerih je za uspešno reševanje naloge
-potrebna aproksimacija neke funkcije z drugimi.
+potrebna aproksimacija neke funkcije z drugimi. Za temi nalogami program sam
+generira nove primere.
 
 ## Namestitev
 
