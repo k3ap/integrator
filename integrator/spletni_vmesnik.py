@@ -366,5 +366,5 @@ def staticne_datoteke(datoteka):
 
 if __name__ == "__main__":
     debug_nacin = os.environ.get("DEBUG") is not None
-    bottle.run(reloader=debug_nacin, debug=debug_nacin)
+    bottle.run(reloader=debug_nacin, debug=debug_nacin, host='0.0.0.0')
     integrator.shrani_v_datoteko(DATOTEKA_Z_BAZO_PODATKOV)
