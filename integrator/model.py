@@ -507,7 +507,7 @@ class Integrator(ShranljivObjekt):
         """Ustvari novo, naključno generirano nalogo."""
 
         # Koliko je minimalna in koliko maksimalna globina funkcije
-        KOMPLEKSNOST = (2, 5)
+        KOMPLEKSNOST = (2, 4)
 
         obmocje = [-1, 1]
         niz_funkcije = funkcije.generiraj_funkcijo(random.randint(*KOMPLEKSNOST))
