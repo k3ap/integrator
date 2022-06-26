@@ -9,25 +9,25 @@
                     % for naloga, status in vrstica:
                         % if status == "zeleno":
                             <td class="green lighten-1 center-align">
-                                <a href="/naloga/{{ naloga }}/" class="green-text text-darken-3 btn-flat">        
+                                <a href="/naloga/{{ naloga }}/" class="green-text text-darken-3 btn-flat naloga-gumb">
                                     {{ naloga }}
                                 </a>
                             </td>
                             
                         % elif status == "rdece":
                             <td class="red center-align">
-                                <a href="/naloga/{{ naloga }}/" class="red-text text-darken-3 btn-flat">
+                                <a href="/naloga/{{ naloga }}/" class="red-text text-darken-3 btn-flat naloga-gumb">
                                     {{ naloga }}
                                 </a>
                             </td>
                         % elif status == "modro":
                             <td class="blue-grey lighten-5 center-align">
-                                <a href="/naloga/{{ naloga }}/" class="blue-text btn-flat">
+                                <a href="/naloga/{{ naloga }}/" class="blue-text btn-flat naloga-gumb">
                                     {{ naloga }}
                                 </a>
                             </td>
                         % else:
-                            <td class="grey lighten-1 white-text center-align">
+                            <td class="grey lighten-1 white-text center-align naloga-gumb">
                                 <a class="btn-flat disabled">
                                     {{ naloga }}
                                 </a>
