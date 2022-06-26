@@ -1723,5 +1723,293 @@
     }
   ],
   "uporabniki": [
+    {
+      "_id": "IJzEcQXj5zcQKog9",
+      "oddaje": [
+        {
+          "_id": "O0CBhnfiw2zfOaC9",
+          "naloga": "WcQDzDg0HA9t5Yeb",
+          "funkcija": {
+            "_id": "n5Wh8XSDdKuRxFdx",
+            "niz": "x^2",
+            "obmocje": [
+              -10.0,
+              10.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:24:40.221035",
+          "rezultat": 100
+        },
+        {
+          "_id": "ol6fMiX8XGyYLysy",
+          "naloga": "Mvk2XJH5Oz0menRu",
+          "funkcija": {
+            "_id": "FHpkHQdMJZ4lN7L1",
+            "niz": "e^x",
+            "obmocje": [
+              -3.0,
+              3.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:24:51.730213",
+          "rezultat": 100
+        },
+        {
+          "_id": "ADK6SEKatMr0LapC",
+          "naloga": "mq3NkbJgfQUcobZc",
+          "funkcija": {
+            "_id": "qxJwiCKLvlK2Cwmz",
+            "niz": "0.5 * x^2",
+            "obmocje": [
+              1.0,
+              10.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:24:57.785702",
+          "rezultat": 100
+        },
+        {
+          "_id": "LALWnh8rtU0RW4fd",
+          "naloga": "eYYoclT15tpHkPU1",
+          "funkcija": {
+            "_id": "aOQaqIx4GLQHVnPo",
+            "niz": "2 * sqrt(x) + x",
+            "obmocje": [
+              0.0,
+              10.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:25:05.115192",
+          "rezultat": 100
+        },
+        {
+          "_id": "EWnDauXmWADONU4w",
+          "naloga": "nFG3UqvAj4B6RM2M",
+          "funkcija": {
+            "_id": "3NegMPQLzCJMWGAo",
+            "niz": "-cos(x) + sinh(x)",
+            "obmocje": [
+              -3.0,
+              3.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:25:14.055528",
+          "rezultat": 100
+        },
+        {
+          "_id": "ouBxb3FUdWHqks9S",
+          "naloga": "atHp3QG39dSngHmf",
+          "funkcija": {
+            "_id": "UXVgURCY8etkyusb",
+            "niz": "0.5 * ln(1 + x^2)",
+            "obmocje": [
+              -5.0,
+              5.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:25:22.141406",
+          "rezultat": 100
+        },
+        {
+          "_id": "CT1JLPyp1K4LrDdJ",
+          "naloga": "sLXt0Y85TuXWV5er",
+          "funkcija": {
+            "_id": "bLsdW69AtNnJW7By",
+            "niz": "-x * cos(x) + sin(x)",
+            "obmocje": [
+              -5.0,
+              5.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:25:31.126594",
+          "rezultat": 100
+        },
+        {
+          "_id": "w3lPEhPvJCaVIept",
+          "naloga": "teGQQb2eXw855pJD",
+          "funkcija": {
+            "_id": "zq2Dn3ExHrq0q9Eq",
+            "niz": "0.5 * x^2",
+            "obmocje": [
+              -0.25,
+              0.25
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:25:53.879508",
+          "rezultat": 92
+        },
+        {
+          "_id": "gFQPzjLiSar8IXpI",
+          "naloga": "WvU1fAvO24CKAPX9",
+          "funkcija": {
+            "_id": "lfZf9M447ndoIRR8",
+            "niz": "0.5 * x^2",
+            "obmocje": [
+              -1.0,
+              1.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:26:17.182685",
+          "rezultat": 84
+        },
+        {
+          "_id": "BeuiGJwPA1Ak0L2V",
+          "naloga": "uvy5iocBy5759pmt",
+          "funkcija": {
+            "_id": "EklICQaQ2jRNgrUR",
+            "niz": "x^3 / 3",
+            "obmocje": [
+              -0.5,
+              0.5
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:26:24.377611",
+          "rezultat": 95
+        },
+        {
+          "_id": "ONnNwF3pqbD748c5",
+          "naloga": "1xFpBubXfjeeT3tN",
+          "funkcija": {
+            "_id": "q1fu5hidnlCgJ314",
+            "niz": "x^3 / abs(x) * 0.5",
+            "obmocje": [
+              -5.0,
+              5.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:26:36.581154",
+          "rezultat": 100
+        },
+        {
+          "_id": "Kgq6fawAdSPcCFaz",
+          "naloga": "NAjlgRMsndddqju0",
+          "funkcija": {
+            "_id": "v4sVDmgFD9U6jzHQ",
+            "niz": "arctan(x)",
+            "obmocje": [
+              -1.0,
+              1.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:26:54.472088",
+          "rezultat": 80
+        },
+        {
+          "_id": "a2fujquEATy7GJlb",
+          "naloga": "BwWxLSHMxN1wpTO8",
+          "funkcija": {
+            "_id": "wnfTg5hEL0HdtqrE",
+            "niz": "x * floor(x)",
+            "obmocje": [
+              -5.0,
+              5.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:27:00.007983",
+          "rezultat": 100
+        },
+        {
+          "_id": "oi9CzdkaejkHwApg",
+          "naloga": "Ixf4TOUgucXW35mZ",
+          "funkcija": {
+            "_id": "9pkbCgyVhyYW3J20",
+            "niz": "0.83 * x",
+            "obmocje": [
+              -0.25,
+              0.25
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:27:21.340776",
+          "rezultat": 80
+        },
+        {
+          "_id": "D9ZzFYhH5lL75IZv",
+          "naloga": "MQRtcBr1tRYLUjTG",
+          "funkcija": {
+            "_id": "o1C2nPbNHNyZe94A",
+            "niz": "0.5 * x + 0.11 * x^3 / 3",
+            "obmocje": [
+              -1.0,
+              1.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:27:33.438103",
+          "rezultat": 83
+        },
+        {
+          "_id": "0lyTuvFiUnE7BLqT",
+          "naloga": "UApqdtF1qiYYk9HR",
+          "funkcija": {
+            "_id": "KSqUBp8iKPoYqxqz",
+            "niz": "x - x^3 / abs(x) * 0.5 * 0.8",
+            "obmocje": [
+              -1.0,
+              1.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:27:50.087532",
+          "rezultat": 87
+        },
+        {
+          "_id": "wya1PlmmLGXZrw6F",
+          "naloga": "TGGNUsxIZY97Jy5r",
+          "funkcija": {
+            "_id": "GRayRXIuZm2iEanS",
+            "niz": "0.857 * x * (-x)^(0.4)",
+            "obmocje": [
+              -1.0,
+              0.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:28:11.019344",
+          "rezultat": 81
+        },
+        {
+          "_id": "8UoeSRNC9hFgISGW",
+          "naloga": "tGBGQdFJ5Bm2MCzK",
+          "funkcija": {
+            "_id": "jV3ui3Y1vOpFvohu",
+            "niz": "-0.6 * x^3 / 3",
+            "obmocje": [
+              -1.0,
+              1.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:28:28.001787",
+          "rezultat": 82
+        },
+        {
+          "_id": "FUKivi2pVZPvQagm",
+          "naloga": "mkveaHxuVC9w0fFR",
+          "funkcija": {
+            "_id": "TGanDmEphTvYteah",
+            "niz": "x - x^7 / abs(x) / 6",
+            "obmocje": [
+              -0.8,
+              0.8
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:28:37.419239",
+          "rezultat": 85
+        },
+        {
+          "_id": "lNXdYNn8WU6MRbyx",
+          "naloga": "rJhEMGQvdYxiPTlj",
+          "funkcija": {
+            "_id": "MUl1gTVCZBygYkdq",
+            "niz": "1.55 * x - 0.385 * abs(x)^(3.6) / x",
+            "obmocje": [
+              -1.0,
+              1.0
+            ]
+          },
+          "cas_oddaje": "2022-06-26T17:28:56.189694",
+          "rezultat": 80
+        }
+      ],
+      "uporabnisko_ime": "resevalec",
+      "sol": "0cdc3987976f402414fbd3806448a932",
+      "razprsitev": "cf9e4a6c730479c0005e7893a81a0b335c80ed349df6d5284cf7c1bbd88babeb"
+    }
   ]
 }
